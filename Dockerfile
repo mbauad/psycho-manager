@@ -1,9 +1,12 @@
 # Estágio 1: Builder
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 
 WORKDIR /app
 
-# Instalar dependências
+# Instalar dependências do sistema
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
+# Instalar dependências do projeto
 COPY package*.json ./
 RUN npm ci
 
@@ -19,21 +22,25 @@ RUN npx prisma generate
 RUN npm run build
 
 # Estágio 2: Produção
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
 
 WORKDIR /app
 
-# Não rodar como root
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Instalar openssl (necessário para Prisma)
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
-# Copiar arquivos necessários
+# Não rodar como root
+RUN groupadd --system --gid 1001 nodejs
+RUN useradd --system --uid 1001 nextjs
+
+# Copiar arquivos necessários do builder
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules ./node_modules
 
-# Dar permissões
+# Criar diretório do banco e dar permissões
+RUN mkdir -p prisma
 RUN chown -R nextjs:nodejs /app
 
 USER nextjs
