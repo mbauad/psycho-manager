@@ -1,10 +1,13 @@
 # Estágio 1: Builder
 FROM node:20-slim AS builder
 
+# Forçar rebuild sem cache
+ARG CACHEBUST=2
+
 WORKDIR /app
 
 # Instalar dependências do sistema
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y openssl libssl-dev && rm -rf /var/lib/apt/lists/*
 
 # Instalar dependências do projeto
 COPY package*.json ./
@@ -26,7 +29,7 @@ FROM node:20-slim AS runner
 WORKDIR /app
 
 # Instalar openssl (necessário para Prisma)
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y openssl libssl-dev && rm -rf /var/lib/apt/lists/*
 
 # Não rodar como root
 RUN groupadd --system --gid 1001 nodejs
