@@ -17,8 +17,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-# Gerar Prisma Client e buildar
-RUN npx prisma generate
+# Buildar (sem gerar Prisma ainda)
 RUN npm run build
 
 # Estágio 2: Produção
@@ -33,11 +32,13 @@ RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 RUN groupadd --system --gid 1001 nodejs
 RUN useradd --system --uid 1001 nextjs
 
-# Copiar arquivos necessários do builder
+# Copiar arquivos necessários
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules ./node_modules
+
+# Instalar apenas dependências de produção e gerar Prisma para DEBIAN
+RUN npm ci --omit=dev && npx prisma generate
 
 # Criar diretório do banco e dar permissões
 RUN mkdir -p prisma
