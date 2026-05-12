@@ -12,6 +12,8 @@ services:
       - DATABASE_URL=file:./dev.db
       - AUTH_SECRET=${AUTH_SECRET}
       - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
     volumes:
       - ./prisma/dev.db:/app/prisma/dev.db
       - ./prisma/dev.db-journal:/app/prisma/dev.db-journal

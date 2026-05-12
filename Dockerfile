@@ -25,8 +25,8 @@ COPY . .
 RUN npm run build
 
 # Expor porta
-ENV PORT=3000
+ENV PORT=80
 ENV HOSTNAME="0.0.0.0"
-EXPOSE 3000
+EXPOSE 80
 
 CMD ["sh", "-c", "npx prisma db push && npm start"]
