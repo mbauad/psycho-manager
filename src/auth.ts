@@ -84,8 +84,4 @@ declare module "next-auth" {
   }
 }
 
-declare module "next-auth/jwt" {
-  interface JWT {
-    role?: string;
-  }
-}
+// Tipos JWT são inferidos automaticamente na v5 do next-auth
