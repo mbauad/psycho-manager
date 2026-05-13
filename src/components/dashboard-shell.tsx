@@ -84,7 +84,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
-          <div className="relative h-full w-72 bg-[#1e3a5f]">
+          <div className="relative h-full w-72" style={{ background: 'linear-gradient(180deg, #1e3a5f 0%, #1e40af 100%)', color: 'white' }}>
             <button
               type="button"
               className="absolute top-4 right-4 text-white/60 hover:text-white p-2"
