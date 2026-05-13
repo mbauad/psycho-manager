@@ -1251,6 +1251,283 @@ textarea.form-input {
   animation: slideIn 0.3s ease;
 }
 
+/* === DARK MODE === */
+.dark body {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.dark .top-header {
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.dark .header-btn {
+  background: #334155;
+  color: #94a3b8;
+}
+
+.dark .header-btn:hover {
+  background: #475569;
+  color: #e2e8f0;
+}
+
+.dark .card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.dark .card-header {
+  border-bottom: 1px solid #334155;
+}
+
+.dark .card-title {
+  color: #f1f5f9;
+}
+
+.dark .card-footer {
+  background: #1e293b;
+  border-top: 1px solid #334155;
+}
+
+.dark .stat-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+.dark .stat-card-label {
+  color: #94a3b8;
+}
+
+.dark .stat-card-value {
+  color: #f1f5f9;
+}
+
+.dark .page-title {
+  color: #f1f5f9;
+}
+
+.dark .page-subtitle {
+  color: #94a3b8;
+}
+
+.dark .form-input {
+  background: #1e293b;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+.dark .form-input::placeholder {
+  color: #64748b;
+}
+
+.dark .form-select {
+  background: #1e293b;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+.dark .form-label {
+  color: #cbd5e1;
+}
+
+.dark .table th {
+  background: #1e293b;
+  color: #94a3b8;
+  border-bottom: 1px solid #334155;
+}
+
+.dark .table td {
+  color: #cbd5e1;
+  border-bottom: 1px solid #334155;
+}
+
+.dark .table tr:hover td {
+  background: #1e293b;
+}
+
+.dark .search-box-input {
+  background: #1e293b;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+.dark .modal {
+  background: #1e293b;
+}
+
+.dark .modal-title {
+  color: #f1f5f9;
+}
+
+.dark .modal-close {
+  background: #334155;
+  color: #94a3b8;
+}
+
+.dark .modal-close:hover {
+  background: #475569;
+  color: #e2e8f0;
+}
+
+.dark .modal-footer {
+  border-top: 1px solid #334155;
+}
+
+.dark .session-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+.dark .session-card-name {
+  color: #f1f5f9;
+}
+
+.dark .session-card-time,
+.dark .session-card-desc {
+  color: #94a3b8;
+}
+
+.dark .calendar {
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+.dark .calendar-header {
+  border-bottom: 1px solid #334155;
+}
+
+.dark .calendar-title {
+  color: #f1f5f9;
+}
+
+.dark .calendar-weekday {
+  background: #1e293b;
+  color: #94a3b8;
+  border-bottom: 1px solid #334155;
+}
+
+.dark .calendar-day {
+  border-right: 1px solid #334155;
+  border-bottom: 1px solid #334155;
+}
+
+.dark .calendar-day-number {
+  color: #cbd5e1;
+}
+
+.dark .calendar-day.other-month {
+  background: #1e293b;
+}
+
+.dark .calendar-nav-btn {
+  background: #1e293b;
+  border: 1px solid #475569;
+  color: #94a3b8;
+}
+
+.dark .calendar-nav-btn:hover {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+.dark .detail-aside {
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+.dark .detail-back-btn {
+  background: #1e293b;
+  border: 1px solid #475569;
+  color: #94a3b8;
+}
+
+.dark .detail-back-btn:hover {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+.dark .detail-info-item {
+  border-bottom: 1px solid #334155;
+}
+
+.dark .detail-info-label {
+  color: #94a3b8;
+}
+
+.dark .detail-info-value {
+  color: #e2e8f0;
+}
+
+.dark .detail-info-icon {
+  background: #334155;
+  color: #94a3b8;
+}
+
+.dark .empty-state {
+  color: #64748b;
+}
+
+.dark .empty-state-title {
+  color: #94a3b8;
+}
+
+.dark .empty-state-desc {
+  color: #64748b;
+}
+
+.dark .login-right {
+  background: #0f172a;
+}
+
+.dark .login-form-title {
+  color: #f1f5f9;
+}
+
+.dark .login-form-subtitle {
+  color: #94a3b8;
+}
+
+.dark .login-form-link {
+  color: #94a3b8;
+}
+
+.dark .btn-secondary {
+  background: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #475569;
+}
+
+.dark .btn-secondary:hover {
+  background: #334155;
+  border-color: #64748b;
+}
+
+.dark .btn-ghost {
+  color: #94a3b8;
+}
+
+.dark .btn-ghost:hover {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+.dark .filter-bar .search-box-input {
+  background: #1e293b;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
   .sidebar {

@@ -15,6 +15,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { ThemeToggle } from "./theme-toggle";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
@@ -110,6 +111,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
           </div>
 
           <div className="header-right">
+            <ThemeToggle />
             <button type="button" className="header-btn" onClick={() => signOut({ callbackUrl: "/login" })} title="Sair">
               <LogOut className="w-5 h-5" />
             </button>
