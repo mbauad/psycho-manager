@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   Settings,
+  Shield,
   Users,
   X,
 } from "lucide-react";
@@ -27,7 +28,9 @@ const navItems = [
   { href: "/configuracoes", label: "Configuracoes", icon: Settings },
 ];
 
-function SidebarContent({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
+const adminItem = { href: "/admin", label: "Admin", icon: Shield };
+
+function SidebarContent({ pathname, onNavigate, isAdmin }: { pathname: string; onNavigate?: () => void; isAdmin: boolean }) {
   const isActive = (href: string) => {
     if (href === "/dashboard") return pathname === "/dashboard";
     return pathname.startsWith(href);
@@ -57,6 +60,20 @@ function SidebarContent({ pathname, onNavigate }: { pathname: string; onNavigate
           );
         })}
 
+        {isAdmin && (
+          <>
+            <div className="sidebar-section-label" style={{ marginTop: 24 }}>Sistema</div>
+            <Link
+              href={adminItem.href}
+              onClick={onNavigate}
+              className={`nav-item ${isActive(adminItem.href) ? "active" : ""}`}
+            >
+              <Shield />
+              <span className="nav-item-label">{adminItem.label}</span>
+            </Link>
+          </>
+        )}
+
         <div className="sidebar-section-label" style={{ marginTop: 24 }}>Conta</div>
         <button
           type="button"
@@ -72,14 +89,15 @@ function SidebarContent({ pathname, onNavigate }: { pathname: string; onNavigate
   );
 }
 
-export function DashboardShell({ children }: { children: ReactNode }) {
+export function DashboardShell({ children, userRole, userName }: { children: ReactNode; userRole?: string; userName?: string | null }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const isAdmin = userRole === "ADMIN";
 
   return (
     <div className="dashboard-layout">
       <aside className="sidebar hidden md:block">
-        <SidebarContent pathname={pathname} />
+        <SidebarContent pathname={pathname} isAdmin={isAdmin} />
       </aside>
 
       {mobileOpen && (
@@ -93,7 +111,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
             >
               <X className="w-5 h-5" />
             </button>
-            <SidebarContent pathname={pathname} onNavigate={() => setMobileOpen(false)} />
+            <SidebarContent pathname={pathname} onNavigate={() => setMobileOpen(false)} isAdmin={isAdmin} />
           </div>
         </div>
       )}
@@ -111,6 +129,11 @@ export function DashboardShell({ children }: { children: ReactNode }) {
           </div>
 
           <div className="header-right">
+            {userName && (
+              <span className="hidden sm:inline text-sm text-gray-500 dark:text-gray-400 font-medium">
+                {userName}
+              </span>
+            )}
             <ThemeToggle />
             <button type="button" className="header-btn" onClick={() => signOut({ callbackUrl: "/login" })} title="Sair">
               <LogOut className="w-5 h-5" />

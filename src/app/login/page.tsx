@@ -64,8 +64,8 @@ function LoginForm() {
         {loading ? "Entrando..." : "Entrar"}
       </button>
 
-      <p className="login-form-link">
-        Nao tem conta? <Link href="/register">Cadastre-se</Link>
+      <p className="login-form-link" style={{ fontSize: 12, color: "#94a3b8" }}>
+        Acesso restrito. Entre em contato com o administrador.
       </p>
     </form>
   );
