@@ -1,4 +1,4 @@
-FROM node:22
+FROM node:22-alpine
 WORKDIR /app
 COPY .next/standalone ./
 EXPOSE 3000
