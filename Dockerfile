@@ -1,32 +1,50 @@
-FROM node:20
+# syntax=docker.io/docker/dockerfile:1
 
+FROM node:22-alpine AS base
+
+# 1. Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
-# Copiar e instalar dependencias
-COPY package*.json ./
+# Install dependencies based on the preferred package manager
+COPY package.json package-lock.json* ./
 RUN npm ci
 
-# Gerar Prisma antes do build do Next.js
-COPY prisma ./prisma
-ARG DATABASE_URL="file:./dev.db"
-ARG AUTH_SECRET="build-time-secret-build-time-secret"
-ARG NEXTAUTH_URL="http://localhost:3000"
-ENV DATABASE_URL=${DATABASE_URL}
-ENV AUTH_SECRET=${AUTH_SECRET}
-ENV NEXTAUTH_URL=${NEXTAUTH_URL}
+# 2. Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Generate Prisma Client and build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 RUN npx prisma generate
-
-# Copiar projeto
-COPY . .
-
-# Buildar aplicacao
 RUN npm run build
 
-# Expor porta
-ENV PORT=80
-ENV HOSTNAME="0.0.0.0"
-EXPOSE 80
+# 3. Production image, copy all the files and run next
+FROM base AS runner
+WORKDIR /app
 
-CMD ["sh", "-c", "npx prisma db push && npm start"]
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+
+# Automatically leverage output traces to reduce image size
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"]
