@@ -1,7 +1,8 @@
 FROM node:22-alpine
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
-COPY package*.json prisma/schema.prisma ./prisma/
+COPY package*.json ./
+COPY prisma/schema.prisma ./prisma/
 RUN npm ci
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
