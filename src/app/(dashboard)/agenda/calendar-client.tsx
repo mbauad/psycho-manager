@@ -13,6 +13,7 @@ import {
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 interface AgendaSessao {
   id: string;
@@ -94,9 +95,14 @@ export function AgendaClient({ sessions }: AgendaClientProps) {
             >
               <div className="calendar-day-number">{format(day, "d")}</div>
               {daySessions.slice(0, 3).map((s) => (
-                <div key={s.id} className={`calendar-event ${getStatusColor(s.status)}`}>
+                <Link
+                  key={s.id}
+                  href={`/sessoes/${s.id}`}
+                  className={`calendar-event ${getStatusColor(s.status)}`}
+                  style={{ textDecoration: "none", display: "block" }}
+                >
                   {format(new Date(s.dataHoraInicio), "HH:mm")} {s.paciente.nomeCompleto.split(" ")[0]}
-                </div>
+                </Link>
               ))}
               {daySessions.length > 3 && (
                 <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>
