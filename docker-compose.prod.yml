@@ -7,13 +7,21 @@ services:
       dockerfile: Dockerfile
     container_name: psycho-manager
     restart: always
-    ports:
-      - "3001:3000"
     env_file:
       - .env
     networks:
       - psycho_supabase_default
-      - default
+      - easypanel
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.psycho-manager.rule=Host(`psycho-manager.site`)"
+      - "traefik.http.routers.psycho-manager.entrypoints=https"
+      - "traefik.http.routers.psycho-manager.tls=true"
+      - "traefik.http.routers.psycho-manager.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.psycho-manager-http.rule=Host(`psycho-manager.site`)"
+      - "traefik.http.routers.psycho-manager-http.entrypoints=http"
+      - "traefik.http.routers.psycho-manager-http.middlewares=redirect-to-https"
+      - "traefik.http.services.psycho-manager.loadbalancer.server.port=3000"
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/login"]
       interval: 30s
@@ -24,5 +32,5 @@ services:
 networks:
   psycho_supabase_default:
     external: true
-  default:
-    driver: bridge
+  easypanel:
+    external: true
