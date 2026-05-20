@@ -10,6 +10,12 @@ interface Paciente {
   nomeCompleto: string;
 }
 
+interface SessaoOption {
+  id: string;
+  dataHoraInicio: string;
+  status: string;
+}
+
 interface Pagamento {
   id: string;
   valor: number;
@@ -35,6 +41,8 @@ export function FinanceiroClient({ pagamentos, pacientes, totalRecebido, totalPe
   const [loading, setLoading] = useState(false);
   const formRef = React.useRef<HTMLFormElement>(null);
   const [success, setSuccess] = useState(false);
+  const [sessoes, setSessoes] = useState<SessaoOption[]>([]);
+  const [pacienteSelecionado, setPacienteSelecionado] = useState("");
 
   const statusBadge: Record<string, string> = {
     recebido: "badge-green",
@@ -79,7 +87,32 @@ export function FinanceiroClient({ pagamentos, pacientes, totalRecebido, totalPe
 
   const openCreate = () => {
     setEditingId(null);
+    setPacienteSelecionado("");
+    setSessoes([]);
     setShowModal(true);
+  };
+
+  useEffect(() => {
+    if (!pacienteSelecionado) {
+      setSessoes([]);
+      return;
+    }
+    fetch(`/api/sessoes-paciente?pacienteId=${pacienteSelecionado}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setSessoes(data);
+      });
+  }, [pacienteSelecionado]);
+
+  const handleSessaoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const sessaoId = e.target.value;
+    const sessao = sessoes.find((s) => s.id === sessaoId);
+    if (sessao && formRef.current) {
+      const dataInput = formRef.current.querySelector<HTMLInputElement>('input[name="data"]');
+      if (dataInput) {
+        dataInput.value = new Date(sessao.dataHoraInicio).toISOString().split("T")[0];
+      }
+    }
   };
 
   return (
@@ -198,12 +231,32 @@ export function FinanceiroClient({ pagamentos, pacientes, totalRecebido, totalPe
               <div className="modal-body">
                 <div className="form-group">
                   <label className="form-label">Paciente</label>
-                  <select name="pacienteId" className="form-select">
+                  <select
+                    name="pacienteId"
+                    className="form-select"
+                    value={pacienteSelecionado}
+                    onChange={(e) => setPacienteSelecionado(e.target.value)}
+                  >
                     <option value="">Selecione...</option>
                     {pacientes.map((p) => (
                       <option key={p.id} value={p.id}>{p.nomeCompleto}</option>
                     ))}
                   </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Sessao vinculada</label>
+                  <select name="sessaoId" className="form-select" onChange={handleSessaoChange}>
+                    <option value="">Nenhuma / Manual...</option>
+                    {sessoes.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {new Date(s.dataHoraInicio).toLocaleDateString("pt-BR")} - {s.status}
+                      </option>
+                    ))}
+                  </select>
+                  <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 4 }}>
+                    Selecione uma sessao para preencher a data automaticamente
+                  </p>
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>

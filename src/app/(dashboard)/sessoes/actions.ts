@@ -105,12 +105,43 @@ export async function concluirSessao(id: string) {
     return;
   }
 
+  const sessaoAtual = await db.sessao.findFirst({
+    where: { id, userId: session.user.id },
+    include: { paciente: true },
+  });
+
+  if (!sessaoAtual) return;
+
   await db.sessao.update({
     where: { id, userId: session.user.id },
     data: { status: "realizada" },
   });
 
+  // Buscar valor da sessao na configuracao do usuario
+  const config = await db.configuracao.findFirst({
+    where: { userId: session.user.id },
+  });
+
+  const valorSessao = config?.valorSessao ?? 0;
+
+  if (valorSessao > 0) {
+    await db.pagamento.create({
+      data: {
+        pacienteId: sessaoAtual.pacienteId,
+        sessaoId: sessaoAtual.id,
+        valor: valorSessao,
+        data: new Date(),
+        tipo: "sessao",
+        formaPagamento: "pix",
+        status: "pendente",
+        observacoes: `Pagamento gerado automaticamente da sessao de ${sessaoAtual.paciente?.nomeCompleto ?? "paciente"}`,
+        userId: session.user.id,
+      },
+    });
+  }
+
   revalidatePath("/sessoes");
   revalidatePath(`/sessoes/${id}`);
+  revalidatePath("/financeiro");
   redirect(`/sessoes/${id}`);
 }
