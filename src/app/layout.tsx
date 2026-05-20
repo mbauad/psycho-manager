@@ -5,6 +5,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 export const metadata: Metadata = {
   title: "PsychoManager - Gestao de consultorio",
   description: "Plataforma clinica para gerenciamento de pacientes, sessoes e prontuarios",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({
