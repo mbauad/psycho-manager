@@ -149,7 +149,7 @@ export function RelatoriosClient({
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="mes" />
                 <YAxis />
-                <Tooltip formatter={(value: number) => `R$ ${value.toFixed(2)}`} />
+                <Tooltip formatter={(value) => typeof value === "number" ? `R$ ${value.toFixed(2)}` : value} />
                 <Line type="monotone" dataKey="valor" stroke="#059669" strokeWidth={3} dot={{ r: 5 }} />
               </LineChart>
             </ResponsiveContainer>
