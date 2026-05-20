@@ -12,12 +12,24 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
-  Area,
   AreaChart,
+  Area,
+  Legend,
+  ComposedChart,
+  Line,
 } from "recharts";
-import { Printer, Users, Calendar, DollarSign, Activity, TrendingUp } from "lucide-react";
+import {
+  Printer,
+  Users,
+  Calendar,
+  DollarSign,
+  Activity,
+  TrendingUp,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+} from "lucide-react";
 
 interface RelatoriosClientProps {
   sessoesPorMes: { mes: string; quantidade: number }[];
@@ -34,13 +46,6 @@ interface RelatoriosClientProps {
   };
 }
 
-const CARD_COLORS = [
-  { bg: "rgba(37, 99, 235, 0.15)", iconColor: "#2563eb", border: "rgba(37, 99, 235, 0.3)" },
-  { bg: "rgba(5, 150, 105, 0.15)", iconColor: "#059669", border: "rgba(5, 150, 105, 0.3)" },
-  { bg: "rgba(139, 92, 246, 0.15)", iconColor: "#8b5cf6", border: "rgba(139, 92, 246, 0.3)" },
-  { bg: "rgba(217, 119, 6, 0.15)", iconColor: "#d97706", border: "rgba(217, 119, 6, 0.3)" },
-];
-
 export function RelatoriosClient({
   sessoesPorMes,
   receitaPorMes,
@@ -53,41 +58,49 @@ export function RelatoriosClient({
     window.print();
   };
 
-  const stats: {
-    label: string;
-    value: string | number;
-    icon: React.ElementType;
-    bg: string;
-    iconColor: string;
-    border: string;
-    suffix?: string;
-  }[] = [
+  const kpis = [
     {
-      label: "Total Pacientes",
+      label: "Pacientes",
       value: resumo.totalPacientes,
       icon: Users,
-      ...CARD_COLORS[0],
+      gradient: "linear-gradient(135deg, #2563eb, #1d4ed8)",
+      iconBg: "rgba(37, 99, 235, 0.2)",
+      iconColor: "#60a5fa",
     },
     {
-      label: "Total de Sessoes",
+      label: "Sessoes",
       value: resumo.totalSessoes,
       icon: Calendar,
-      ...CARD_COLORS[1],
+      gradient: "linear-gradient(135deg, #059669, #047857)",
+      iconBg: "rgba(5, 150, 105, 0.2)",
+      iconColor: "#34d399",
     },
     {
-      label: "Receita Total",
-      value: `R$ ${resumo.receitaTotal.toFixed(2)}`,
+      label: "Receita",
+      value: `R$ ${resumo.receitaTotal.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+      })}`,
       icon: DollarSign,
-      ...CARD_COLORS[2],
+      gradient: "linear-gradient(135deg, #7c3aed, #6d28d9)",
+      iconBg: "rgba(124, 58, 237, 0.2)",
+      iconColor: "#a78bfa",
     },
     {
-      label: "Media Mensal",
-      value: `${resumo.mediaMensal}`,
-      suffix: "sessoes",
-      icon: Activity,
-      ...CARD_COLORS[3],
+      label: "Taxa Comparecimento",
+      value: `${resumo.taxa}%`,
+      icon: TrendingUp,
+      gradient: "linear-gradient(135deg, #d97706, #b45309)",
+      iconBg: "rgba(217, 119, 6, 0.2)",
+      iconColor: "#fbbf24",
     },
   ];
+
+  const statusIcon = {
+    Realizadas: CheckCircle,
+    Agendadas: Clock,
+    Canceladas: XCircle,
+    Faltou: AlertTriangle,
+  };
 
   return (
     <div>
@@ -104,7 +117,7 @@ export function RelatoriosClient({
       >
         <div>
           <h1 className="page-title">Relatorios</h1>
-          <p className="page-subtitle">Visao geral da sua clinica</p>
+          <p className="page-subtitle">Painel completo da sua clinica</p>
         </div>
         <button
           onClick={handlePrint}
@@ -113,88 +126,182 @@ export function RelatoriosClient({
             display: "flex",
             alignItems: "center",
             gap: 8,
-            padding: "10px 20px",
+            padding: "10px 22px",
             borderRadius: 12,
             fontWeight: 600,
-            boxShadow: "0 4px 14px rgba(37, 99, 235, 0.35)",
+            boxShadow: "0 4px 16px rgba(37, 99, 235, 0.4)",
+            fontSize: 14,
           }}
         >
           <Printer className="w-4 h-4" />
-          Imprimir / Salvar PDF
+          Imprimir / PDF
         </button>
       </div>
 
       <div ref={printRef} className="print-area">
-        {/* Cards resumo modernos */}
+        {/* KPIs Premium */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: 20,
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: 16,
             marginBottom: 24,
           }}
         >
-          {stats.map((s, i) => (
+          {kpis.map((k, i) => (
             <div
               key={i}
               style={{
-                background: "linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95))",
-                border: `1px solid ${s.border}`,
+                background: k.gradient,
                 borderRadius: 16,
-                padding: 24,
+                padding: "22px 24px",
                 display: "flex",
                 alignItems: "center",
                 gap: 16,
-                transition: "transform 0.2s, box-shadow 0.2s",
+                color: "white",
+                position: "relative",
+                overflow: "hidden",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.25)",
               }}
-              className="stat-card-hover"
             >
               <div
                 style={{
-                  width: 52,
-                  height: 52,
-                  borderRadius: 14,
-                  background: s.bg,
+                  position: "absolute",
+                  top: -20,
+                  right: -20,
+                  width: 80,
+                  height: 80,
+                  borderRadius: "50%",
+                  background: "rgba(255,255,255,0.08)",
+                }}
+              />
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  background: "rgba(255,255,255,0.15)",
+                  backdropFilter: "blur(4px)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexShrink: 0,
+                  zIndex: 1,
                 }}
               >
-                <s.icon size={24} color={s.iconColor} />
+                <k.icon size={22} color="white" />
               </div>
-              <div>
+              <div style={{ zIndex: 1 }}>
                 <p
                   style={{
-                    fontSize: 13,
-                    color: "#94a3b8",
+                    fontSize: 12,
                     fontWeight: 500,
+                    opacity: 0.85,
                     marginBottom: 4,
                     textTransform: "uppercase",
-                    letterSpacing: "0.5px",
+                    letterSpacing: "0.8px",
                   }}
                 >
-                  {s.label}
+                  {k.label}
                 </p>
                 <p
                   style={{
-                    fontSize: 26,
-                    fontWeight: 700,
-                    color: "#f8fafc",
-                    lineHeight: 1.2,
+                    fontSize: 28,
+                    fontWeight: 800,
+                    lineHeight: 1.1,
                   }}
                 >
-                  {s.value}
+                  {k.value}
                 </p>
-                {s.suffix && (
-                  <p style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>{s.suffix}</p>
-                )}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Graficos - linha 1 */}
+        {/* Grafico principal: Receita + Sessoes */}
+        <div
+          style={{
+            background: "linear-gradient(145deg, rgba(30,41,59,0.95), rgba(15,23,42,0.98))",
+            border: "1px solid rgba(148,163,184,0.08)",
+            borderRadius: 20,
+            padding: 28,
+            marginBottom: 20,
+            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+          }}
+        >
+          <div style={{ marginBottom: 24 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: "#f8fafc" }}>
+              Evolucao Mensal
+            </h3>
+            <p style={{ fontSize: 13, color: "#64748b", marginTop: 4 }}>
+              Receita (R$) e quantidade de sessoes por mes
+            </p>
+          </div>
+          <div style={{ height: 320 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={receitaPorMes}>
+                <defs>
+                  <linearGradient id="receitaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.02} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.08)" vertical={false} />
+                <XAxis
+                  dataKey="mes"
+                  tick={{ fill: "#94a3b8", fontSize: 12 }}
+                  axisLine={{ stroke: "rgba(148,163,184,0.1)" }}
+                  tickLine={false}
+                />
+                <YAxis
+                  yAxisId="left"
+                  tick={{ fill: "#94a3b8", fontSize: 12 }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(v) => `R$${v}`}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  tick={{ fill: "#94a3b8", fontSize: 12 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "rgba(15, 23, 42, 0.97)",
+                    border: "1px solid rgba(148,163,184,0.15)",
+                    borderRadius: 12,
+                    color: "#f1f5f9",
+                    fontSize: 13,
+                    padding: 12,
+                  }}
+                  formatter={(value, name) => {
+                    if (name === "valor") return [`R$ ${Number(value).toFixed(2)}`, "Receita"];
+                    return [value, name];
+                  }}
+                />
+                <Legend
+                  wrapperStyle={{ fontSize: 12, color: "#94a3b8", paddingTop: 12 }}
+                  formatter={(value) => (value === "valor" ? "Receita (R$)" : value)}
+                />
+                <Area
+                  yAxisId="left"
+                  type="monotone"
+                  dataKey="valor"
+                  stroke="#10b981"
+                  strokeWidth={3}
+                  fill="url(#receitaGrad)"
+                  dot={{ r: 5, fill: "#10b981", stroke: "#0f172a", strokeWidth: 2 }}
+                  activeDot={{ r: 7, fill: "#34d399" }}
+                  animationDuration={1500}
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Grid: 2 colunas */}
         <div
           style={{
             display: "grid",
@@ -202,82 +309,98 @@ export function RelatoriosClient({
             gap: 20,
           }}
         >
-          {/* Sessoes por mes */}
+          {/* Sessoes por Mes */}
           <div
             style={{
-              background: "linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95))",
-              border: "1px solid rgba(148, 163, 184, 0.1)",
-              borderRadius: 16,
-              padding: 24,
+              background: "linear-gradient(145deg, rgba(30,41,59,0.95), rgba(15,23,42,0.98))",
+              border: "1px solid rgba(148,163,184,0.08)",
+              borderRadius: 20,
+              padding: 28,
+              boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
             }}
           >
             <div style={{ marginBottom: 20 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 600, color: "#f1f5f9" }}>Sessoes por Mes</h3>
-              <p style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>Evolucao da quantidade de atendimentos</p>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: "#f8fafc" }}>
+                Sessoes por Mes
+              </h3>
+              <p style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>
+                Quantidade de atendimentos mensais
+              </p>
             </div>
-            <div style={{ height: 280 }}>
+            <div style={{ height: 260 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={sessoesPorMes}>
                   <defs>
-                    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient id="sessoesGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
-                      <stop offset="100%" stopColor="#1d4ed8" stopOpacity={0.8} />
+                      <stop offset="100%" stopColor="#1d4ed8" stopOpacity={0.7} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.1)" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.08)" vertical={false} />
                   <XAxis
                     dataKey="mes"
-                    tick={{ fill: "#94a3b8", fontSize: 12 }}
-                    axisLine={{ stroke: "rgba(148,163,184,0.15)" }}
+                    tick={{ fill: "#94a3b8", fontSize: 11 }}
+                    axisLine={{ stroke: "rgba(148,163,184,0.1)" }}
                     tickLine={false}
                   />
                   <YAxis
-                    tick={{ fill: "#94a3b8", fontSize: 12 }}
+                    tick={{ fill: "#94a3b8", fontSize: 11 }}
                     axisLine={false}
                     tickLine={false}
                     allowDecimals={false}
                   />
                   <Tooltip
                     contentStyle={{
-                      background: "rgba(15, 23, 42, 0.95)",
-                      border: "1px solid rgba(148,163,184,0.2)",
+                      background: "rgba(15, 23, 42, 0.97)",
+                      border: "1px solid rgba(148,163,184,0.15)",
                       borderRadius: 10,
                       color: "#f1f5f9",
                       fontSize: 13,
                     }}
-                    cursor={{ fill: "rgba(59, 130, 246, 0.08)" }}
+                    cursor={{ fill: "rgba(59,130,246,0.06)" }}
                   />
-                  <Bar dataKey="quantidade" fill="url(#barGradient)" animationDuration={1200} radius={[6, 6, 0, 0]} />
+                  <Bar
+                    dataKey="quantidade"
+                    fill="url(#sessoesGrad)"
+                    radius={[8, 8, 0, 0]}
+                    animationDuration={1200}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Status das sessoes */}
+          {/* Status das Sessoes */}
           <div
             style={{
-              background: "linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95))",
-              border: "1px solid rgba(148, 163, 184, 0.1)",
-              borderRadius: 16,
-              padding: 24,
+              background: "linear-gradient(145deg, rgba(30,41,59,0.95), rgba(15,23,42,0.98))",
+              border: "1px solid rgba(148,163,184,0.08)",
+              borderRadius: 20,
+              padding: 28,
+              boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
             }}
           >
             <div style={{ marginBottom: 20 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 600, color: "#f1f5f9" }}>Status das Sessoes</h3>
-              <p style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>Distribuicao por situacao</p>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: "#f8fafc" }}>
+                Status das Sessoes
+              </h3>
+              <p style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>
+                Distribuicao por situacao
+              </p>
             </div>
-            <div style={{ height: 280 }}>
+            <div style={{ height: 220 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={statusSessoes}
                     cx="50%"
                     cy="50%"
-                    innerRadius={65}
-                    outerRadius={95}
-                    paddingAngle={4}
+                    innerRadius={55}
+                    outerRadius={85}
+                    paddingAngle={5}
                     dataKey="value"
-                    stroke="none"
+                    stroke="rgba(15,23,42,0.9)"
+                    strokeWidth={3}
                     animationDuration={1200}
                   >
                     {statusSessoes.map((entry, index) => (
@@ -286,8 +409,8 @@ export function RelatoriosClient({
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      background: "rgba(15, 23, 42, 0.95)",
-                      border: "1px solid rgba(148,163,184,0.2)",
+                      background: "rgba(15, 23, 42, 0.97)",
+                      border: "1px solid rgba(148,163,184,0.15)",
                       borderRadius: 10,
                       color: "#f1f5f9",
                       fontSize: 13,
@@ -296,159 +419,122 @@ export function RelatoriosClient({
                   />
                 </PieChart>
               </ResponsiveContainer>
-              {/* Legendas customizadas */}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  gap: 16,
-                  flexWrap: "wrap",
-                  marginTop: -10,
-                }}
-              >
-                {statusSessoes.map((s) => (
-                  <div key={s.name} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <div
-                      style={{
-                        width: 10,
-                        height: 10,
-                        borderRadius: 3,
-                        background: s.color,
-                      }}
-                    />
-                    <span style={{ fontSize: 12, color: "#94a3b8" }}>
+            </div>
+            {/* Legendas modernas */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: 14,
+                flexWrap: "wrap",
+                marginTop: 8,
+              }}
+            >
+              {statusSessoes.map((s) => {
+                const IconComp = (statusIcon as any)[s.name] || Activity;
+                return (
+                  <div
+                    key={s.name}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      background: "rgba(148,163,184,0.06)",
+                      padding: "6px 12px",
+                      borderRadius: 20,
+                    }}
+                  >
+                    <IconComp size={13} color={s.color} />
+                    <span style={{ fontSize: 12, color: "#cbd5e1", fontWeight: 500 }}>
                       {s.name} ({s.value})
                     </span>
                   </div>
-                ))}
-              </div>
+                );
+              })}
             </div>
           </div>
         </div>
 
-        {/* Receita por mes - Area Chart */}
+        {/* Resumo Detalhado Premium */}
         <div
           style={{
-            background: "linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95))",
-            border: "1px solid rgba(148, 163, 184, 0.1)",
-            borderRadius: 16,
-            padding: 24,
+            background: "linear-gradient(145deg, rgba(30,41,59,0.95), rgba(15,23,42,0.98))",
+            border: "1px solid rgba(148,163,184,0.08)",
+            borderRadius: 20,
+            padding: 28,
             marginTop: 20,
+            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
           }}
         >
-          <div style={{ marginBottom: 20, display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ marginBottom: 24, display: "flex", alignItems: "center", gap: 12 }}>
             <div
               style={{
-                width: 36,
-                height: 36,
+                width: 40,
+                height: 40,
                 borderRadius: 10,
-                background: "rgba(5, 150, 105, 0.15)",
+                background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <TrendingUp size={18} color="#059669" />
+              <Activity size={20} color="white" />
             </div>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 600, color: "#f1f5f9" }}>Receita por Mes</h3>
-              <p style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>Evolucao financeira da clinica</p>
+              <h3 style={{ fontSize: 17, fontWeight: 700, color: "#f8fafc" }}>
+                Resumo Detalhado
+              </h3>
+              <p style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
+                Indicadores completos da clinica
+              </p>
             </div>
           </div>
-          <div style={{ height: 300 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={receitaPorMes}>
-                <defs>
-                  <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.1)" vertical={false} />
-                <XAxis
-                  dataKey="mes"
-                  tick={{ fill: "#94a3b8", fontSize: 12 }}
-                  axisLine={{ stroke: "rgba(148,163,184,0.15)" }}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fill: "#94a3b8", fontSize: 12 }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(v: number) => `R$${v}`}
-                />
-                <Tooltip
-                  contentStyle={{
-                    background: "rgba(15, 23, 42, 0.95)",
-                    border: "1px solid rgba(148,163,184,0.2)",
-                    borderRadius: 10,
-                    color: "#f1f5f9",
-                    fontSize: 13,
-                  }}
-                  formatter={(value) =>
-                    typeof value === "number" ? `R$ ${value.toFixed(2)}` : value
-                  }
-                />
-                <Area
-                  type="monotone"
-                  dataKey="valor"
-                  stroke="#10b981"
-                  strokeWidth={3}
-                  fill="url(#areaGradient)"
-                  animationDuration={1500}
-                  dot={{ r: 4, fill: "#10b981", stroke: "#fff", strokeWidth: 2 }}
-                  activeDot={{ r: 6, fill: "#34d399", stroke: "#fff", strokeWidth: 2 }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
 
-        {/* Resumo detalhado */}
-        <div
-          style={{
-            background: "linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95))",
-            border: "1px solid rgba(148, 163, 184, 0.1)",
-            borderRadius: 16,
-            padding: 24,
-            marginTop: 20,
-          }}
-        >
-          <div style={{ marginBottom: 20 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 600, color: "#f1f5f9" }}>Resumo Detalhado</h3>
-            <p style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>Indicadores gerais da clinica</p>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+              gap: 12,
+            }}
+          >
             {[
-              { label: "Total de sessoes", value: resumo.totalSessoes },
-              { label: "Sessoes realizadas", value: resumo.sessoesRealizadas },
-              { label: "Sessoes canceladas", value: resumo.sessoesCanceladas },
-              { label: "Pacientes ativos", value: resumo.totalPacientes },
+              { label: "Total de sessoes", value: resumo.totalSessoes, color: "#60a5fa" },
+              { label: "Sessoes realizadas", value: resumo.sessoesRealizadas, color: "#34d399" },
+              { label: "Sessoes canceladas", value: resumo.sessoesCanceladas, color: "#f87171" },
+              { label: "Pacientes ativos", value: resumo.totalPacientes, color: "#a78bfa" },
               {
-                label: "Taxa de comparecimento",
+                label: "Taxa comparecimento",
                 value: `${resumo.taxa}%`,
                 color: resumo.taxa >= 80 ? "#34d399" : resumo.taxa >= 50 ? "#fbbf24" : "#f87171",
               },
-              { label: "Media de sessoes/mes", value: `${resumo.mediaMensal}` },
-              { label: "Receita total", value: `R$ ${resumo.receitaTotal.toFixed(2)}` },
-            ].map((item, i, arr) => (
+              { label: "Media mensal", value: `${resumo.mediaMensal}`, color: "#f472b6" },
+              {
+                label: "Receita total",
+                value: `R$ ${resumo.receitaTotal.toFixed(2)}`,
+                color: "#fbbf24",
+              },
+            ].map((item) => (
               <div
                 key={item.label}
                 style={{
+                  background: "rgba(148, 163, 184, 0.04)",
+                  border: "1px solid rgba(148, 163, 184, 0.08)",
+                  borderRadius: 14,
+                  padding: "18px 20px",
                   display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "14px 16px",
-                  background: i % 2 === 0 ? "rgba(148, 163, 184, 0.03)" : "transparent",
-                  borderRadius: 10,
+                  flexDirection: "column",
+                  gap: 6,
                 }}
               >
-                <span style={{ fontSize: 14, color: "#94a3b8", fontWeight: 500 }}>{item.label}</span>
+                <span style={{ fontSize: 12, color: "#64748b", fontWeight: 500 }}>
+                  {item.label}
+                </span>
                 <span
                   style={{
-                    fontSize: 15,
-                    fontWeight: 700,
-                    color: (item as any).color || "#f8fafc",
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: item.color,
+                    lineHeight: 1.2,
                   }}
                 >
                   {item.value}
@@ -458,8 +544,6 @@ export function RelatoriosClient({
           </div>
         </div>
       </div>
-
-
     </div>
   );
 }
