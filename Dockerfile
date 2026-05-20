@@ -12,4 +12,4 @@ RUN npm run build
 EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node prisma/seed.js && node .next/standalone/server.js"]
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node prisma/seed.js && npm start"]
