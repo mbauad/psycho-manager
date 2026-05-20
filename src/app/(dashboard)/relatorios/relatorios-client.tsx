@@ -292,7 +292,7 @@ export function RelatoriosClient({
                       color: "#f1f5f9",
                       fontSize: 13,
                     }}
-                    formatter={(value: number, name: string) => [`${value} sessoes`, name]}
+                    formatter={(value, name) => [`${value} sessoes`, name]}
                   />
                 </PieChart>
               </ResponsiveContainer>
