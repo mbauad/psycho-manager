@@ -2,8 +2,9 @@ import { db } from "@/lib/db";
 import { auth } from "@/auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Pencil, Trash2, CheckCircle, ArrowLeft } from "lucide-react";
+import { CheckCircle, ArrowLeft } from "lucide-react";
 import { updateSessao, deleteSessao } from "../../actions";
+import { DeleteButton } from "./delete-button";
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -52,10 +53,7 @@ export default async function EditarSessaoPage({ params }: PageProps) {
           <p className="page-subtitle">{sessao.paciente?.nomeCompleto}</p>
         </div>
         <form action={handleDelete} style={{ marginLeft: "auto" }}>
-          <button type="submit" className="btn btn-danger" onClick={(e) => { if (!confirm("Excluir esta sessao?")) e.preventDefault(); }}>
-            <Trash2 className="w-4 h-4" />
-            Excluir
-          </button>
+          <DeleteButton />
         </form>
       </div>
 
