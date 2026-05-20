@@ -217,7 +217,7 @@ export function RelatoriosClient({
             </div>
             <div style={{ height: 280 }}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={sessoesPorMes} barRadius={[6, 6, 0, 0]}>
+                <BarChart data={sessoesPorMes}>
                   <defs>
                     <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
@@ -247,7 +247,7 @@ export function RelatoriosClient({
                     }}
                     cursor={{ fill: "rgba(59, 130, 246, 0.08)" }}
                   />
-                  <Bar dataKey="quantidade" fill="url(#barGradient)" animationDuration={1200} />
+                  <Bar dataKey="quantidade" fill="url(#barGradient)" animationDuration={1200} radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
