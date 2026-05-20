@@ -1,8 +1,9 @@
 import { db } from "@/lib/db";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { Settings, Save } from "lucide-react";
+import { Settings, KeyRound } from "lucide-react";
 import { ProfileForm } from "./profile-form";
+import { PasswordForm } from "./password-form";
 
 export default async function ConfiguracoesPage() {
   const session = await auth();
@@ -21,7 +22,7 @@ export default async function ConfiguracoesPage() {
         </div>
       </div>
 
-      <div className="card" style={{ maxWidth: 700 }}>
+      <div className="card" style={{ maxWidth: 700, marginBottom: 24 }}>
         <div className="card-header">
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <Settings className="w-5 h-5" style={{ color: "#64748b" }} />
@@ -41,6 +42,18 @@ export default async function ConfiguracoesPage() {
               tempoSessao: config?.tempoSessao ?? 50,
             }}
           />
+        </div>
+      </div>
+
+      <div className="card" style={{ maxWidth: 700 }}>
+        <div className="card-header">
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <KeyRound className="w-5 h-5" style={{ color: "#64748b" }} />
+            <h2 className="card-title">Seguranca</h2>
+          </div>
+        </div>
+        <div className="card-body">
+          <PasswordForm />
         </div>
       </div>
     </div>
