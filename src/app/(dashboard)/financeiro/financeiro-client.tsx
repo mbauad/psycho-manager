@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { createPagamento, deletePagamento, updatePagamento } from "./actions";
+import { createPagamento, deletePagamento, updatePagamento, updateStatusPagamento } from "./actions";
 import { Plus, Pencil, Trash2, X, CheckCircle, CreditCard, TrendingUp, Clock } from "lucide-react";
 import React from "react";
 
@@ -200,6 +200,19 @@ export function FinanceiroClient({ pagamentos, pacientes, totalRecebido, totalPe
                     <td style={{ textAlign: "right", fontWeight: 700 }}>R$ {p.valor.toFixed(2)}</td>
                     <td>
                       <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+                        {p.status === "pendente" && (
+                          <button
+                            onClick={async () => {
+                              await updateStatusPagamento(p.id, "recebido");
+                              window.location.reload();
+                            }}
+                            className="btn btn-ghost btn-sm"
+                            style={{ color: "#059669" }}
+                          >
+                            <CheckCircle className="w-3 h-3" />
+                            Receber
+                          </button>
+                        )}
                         <button onClick={() => openEdit(p)} className="btn btn-ghost btn-sm" style={{ color: "#2563eb" }}>
                           <Pencil className="w-3 h-3" />
                           Editar
