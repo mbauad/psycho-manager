@@ -20,7 +20,6 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Copiar apenas o necessário do builder
-COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
