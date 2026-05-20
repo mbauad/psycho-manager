@@ -89,7 +89,7 @@ export default async function RelatoriosPage() {
             ].map((item, i, arr) => (
               <div key={item.label} style={{ display: "flex", justifyContent: "space-between", padding: "16px 0", borderBottom: i < arr.length - 1 ? "1px solid #f1f5f9" : "none" }}>
                 <span style={{ color: "#64748b", fontSize: 14 }}>{item.label}</span>
-                <span style={{ fontWeight: 700, color: item.color || "#0f172a" }}>{item.value}</span>
+                <span className="font-bold text-slate-900 dark:text-slate-100" style={{ color: item.color }}>{item.value}</span>
               </div>
             ))}
           </div>

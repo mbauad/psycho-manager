@@ -88,7 +88,7 @@ export default async function PacientesPage({ searchParams }: PageProps) {
                   pacientes.map((p) => (
                     <tr key={p.id}>
                       <td>
-                        <div style={{ fontWeight: 600, color: "#0f172a" }}>{p.nomeCompleto}</div>
+                        <div className="font-semibold text-slate-900 dark:text-slate-100">{p.nomeCompleto}</div>
                         {p.cpf && <div style={{ fontSize: 12, color: "#94a3b8" }}>CPF: {p.cpf}</div>}
                       </td>
                       <td>

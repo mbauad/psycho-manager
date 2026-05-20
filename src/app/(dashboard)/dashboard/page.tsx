@@ -166,11 +166,11 @@ export default async function DashboardPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div style={{ display: "flex", justifyContent: "space-between", padding: "16px 0", borderBottom: "1px solid #f1f5f9" }}>
                 <span style={{ color: "#64748b", fontSize: 14 }}>Total de sessoes</span>
-                <span style={{ fontWeight: 700, color: "#0f172a" }}>{totalSessoes}</span>
+                <span className="font-bold text-slate-900 dark:text-slate-100">{totalSessoes}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", padding: "16px 0", borderBottom: "1px solid #f1f5f9" }}>
                 <span style={{ color: "#64748b", fontSize: 14 }}>Pacientes ativos</span>
-                <span style={{ fontWeight: 700, color: "#0f172a" }}>{totalPacientes}</span>
+                <span className="font-bold text-slate-900 dark:text-slate-100">{totalPacientes}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", padding: "16px 0", borderBottom: "1px solid #f1f5f9" }}>
                 <span style={{ color: "#64748b", fontSize: 14 }}>Taxa de comparecimento</span>
@@ -178,7 +178,7 @@ export default async function DashboardPage() {
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", padding: "16px 0" }}>
                 <span style={{ color: "#64748b", fontSize: 14 }}>Media de sessoes/mes</span>
-                <span style={{ fontWeight: 700, color: "#0f172a" }}>
+                <span className="font-bold text-slate-900 dark:text-slate-100">
                   {(totalSessoes / Math.max(1, new Date().getMonth() + 1)).toFixed(1)}
                 </span>
               </div>
