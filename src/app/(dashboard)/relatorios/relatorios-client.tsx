@@ -35,10 +35,10 @@ interface RelatoriosClientProps {
 }
 
 const CARD_COLORS = [
-  { bg: "rgba(37, 99, 235, 0.15)", icon: "#2563eb", border: "rgba(37, 99, 235, 0.3)" },
-  { bg: "rgba(5, 150, 105, 0.15)", icon: "#059669", border: "rgba(5, 150, 105, 0.3)" },
-  { bg: "rgba(139, 92, 246, 0.15)", icon: "#8b5cf6", border: "rgba(139, 92, 246, 0.3)" },
-  { bg: "rgba(217, 119, 6, 0.15)", icon: "#d97706", border: "rgba(217, 119, 6, 0.3)" },
+  { bg: "rgba(37, 99, 235, 0.15)", iconColor: "#2563eb", border: "rgba(37, 99, 235, 0.3)" },
+  { bg: "rgba(5, 150, 105, 0.15)", iconColor: "#059669", border: "rgba(5, 150, 105, 0.3)" },
+  { bg: "rgba(139, 92, 246, 0.15)", iconColor: "#8b5cf6", border: "rgba(139, 92, 246, 0.3)" },
+  { bg: "rgba(217, 119, 6, 0.15)", iconColor: "#d97706", border: "rgba(217, 119, 6, 0.3)" },
 ];
 
 export function RelatoriosClient({
@@ -153,7 +153,7 @@ export function RelatoriosClient({
                   flexShrink: 0,
                 }}
               >
-                <s.icon size={24} color={s.icon} />
+                <s.icon size={24} color={s.iconColor} />
               </div>
               <div>
                 <p
