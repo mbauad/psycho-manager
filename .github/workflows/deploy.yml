@@ -1,0 +1,55 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            set -e
+            echo "🚀 Iniciando deploy do Psycho Manager..."
+            
+            # Diretório do projeto na VPS
+            PROJECT_DIR="/opt/psycho-manager"
+            
+            # Criar diretório se não existir
+            if [ ! -d "$PROJECT_DIR" ]; then
+              mkdir -p "$PROJECT_DIR"
+              git clone https://github.com/mbauad/psycho-manager.git "$PROJECT_DIR"
+            fi
+            
+            cd "$PROJECT_DIR"
+            
+            # Puxar últimas mudanças
+            git reset --hard
+            git clean -fd
+            git pull origin main
+            
+            # Copiar .env de produção se não existir
+            if [ ! -f ".env" ]; then
+              cp .env.production .env
+            fi
+            
+            # Build e iniciar containers
+            docker compose -f docker-compose.prod.yml down
+            docker compose -f docker-compose.prod.yml build --no-cache
+            docker compose -f docker-compose.prod.yml up -d
+            
+            # Limpar imagens antigas
+            docker image prune -af --filter "until=24h"
+            
+            echo "✅ Deploy finalizado!"
+            docker compose -f docker-compose.prod.yml ps

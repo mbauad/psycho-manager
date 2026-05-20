@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: psycho-manager
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    networks:
+      - psycho_supabase_default
+      - default
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  psycho_supabase_default:
+    external: true
+  default:
+    driver: bridge
