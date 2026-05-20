@@ -30,14 +30,13 @@ export default function NovaSessaoPage() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(false);
     
     if (!selectedPaciente) {
       return;
     }
     
+    setLoading(true);
     const form = e.currentTarget;
-    form.querySelector<HTMLInputElement>('[name="pacienteId"]')?.setAttribute('value', selectedPaciente);
     
     await createSessao(new FormData(form));
     window.location.href = "/sessoes";
@@ -67,6 +66,7 @@ export default function NovaSessaoPage() {
             <div className="form-group">
               <label className="form-label">Paciente *</label>
               <select
+                name="pacienteId"
                 className="form-select"
                 value={selectedPaciente}
                 onChange={(e) => setSelectedPaciente(e.target.value)}
