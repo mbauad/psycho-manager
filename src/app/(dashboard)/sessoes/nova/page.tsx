@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createSessao } from "../actions";
 import { Calendar, ArrowLeft, Plus } from "lucide-react";
@@ -13,6 +13,20 @@ interface Paciente {
 export default function NovaSessaoPage() {
   const [loading, setLoading] = useState(false);
   const [selectedPaciente, setSelectedPaciente] = useState("");
+  const [pacientes, setPacientes] = useState<Paciente[]>([]);
+  const [loadingPacientes, setLoadingPacientes] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/pacientes")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setPacientes(data);
+        }
+        setLoadingPacientes(false);
+      })
+      .catch(() => setLoadingPacientes(false));
+  }, []);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -57,8 +71,16 @@ export default function NovaSessaoPage() {
                 value={selectedPaciente}
                 onChange={(e) => setSelectedPaciente(e.target.value)}
                 required
+                disabled={loadingPacientes}
               >
-                <option value="">Selecione um paciente...</option>
+                <option value="">
+                  {loadingPacientes ? "Carregando pacientes..." : "Selecione um paciente..."}
+                </option>
+                {pacientes.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.nomeCompleto}
+                  </option>
+                ))}
               </select>
             </div>
 
