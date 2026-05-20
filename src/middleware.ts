@@ -8,16 +8,25 @@ export default auth((req) => {
 
   const isAdminRoute = nextUrl.pathname.startsWith("/admin");
   const isRegisterRoute = nextUrl.pathname === "/register";
+  const isAlterarSenhaRoute = nextUrl.pathname === "/alterar-senha";
   const isAuthRoute = ["/login", "/register"].includes(nextUrl.pathname);
   const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
+  const mustChangePassword = req.auth?.user?.mustChangePassword;
 
   if (isApiAuthRoute) return NextResponse.next();
 
   if (isAuthRoute) {
     if (isLoggedIn) {
+      if (mustChangePassword) {
+        return NextResponse.redirect(new URL("/alterar-senha", nextUrl));
+      }
       return NextResponse.redirect(new URL("/dashboard", nextUrl));
     }
     return NextResponse.next();
+  }
+
+  if (mustChangePassword && !isAlterarSenhaRoute) {
+    return NextResponse.redirect(new URL("/alterar-senha", nextUrl));
   }
 
   if (!isLoggedIn && !isAuthRoute) {
