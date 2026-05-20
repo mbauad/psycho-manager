@@ -53,7 +53,15 @@ export function RelatoriosClient({
     window.print();
   };
 
-  const stats = [
+  const stats: {
+    label: string;
+    value: string | number;
+    icon: React.ElementType;
+    bg: string;
+    iconColor: string;
+    border: string;
+    suffix?: string;
+  }[] = [
     {
       label: "Total Pacientes",
       value: resumo.totalPacientes,
