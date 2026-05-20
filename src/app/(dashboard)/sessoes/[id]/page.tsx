@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Clock, CheckCircle, Pencil } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, CheckCircle, Pencil, Trash2, X } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { deleteSessao, concluirSessao } from "../actions";
@@ -96,7 +96,10 @@ export default async function SessaoDetalhePage({ params }: PageProps) {
 
         <div className="card-footer">
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
-            <Link href="/sessoes" className="btn btn-secondary">Voltar</Link>
+            <Link href="/sessoes" className="btn btn-secondary">
+              <X className="w-4 h-4" />
+              Fechar
+            </Link>
             <Link href={`/sessoes/${id}/editar`} className="btn btn-secondary">
               <Pencil className="w-4 h-4" />
               Editar
@@ -109,7 +112,12 @@ export default async function SessaoDetalhePage({ params }: PageProps) {
                 </button>
               </form>
             )}
-            <Link href="/sessoes" className="btn btn-secondary">Voltar</Link>
+            <form action={deleteSessao.bind(null, id)}>
+              <button type="submit" className="btn btn-danger">
+                <Trash2 className="w-4 h-4" />
+                Excluir
+              </button>
+            </form>
           </div>
         </div>
       </div>
