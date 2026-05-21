@@ -39,7 +39,7 @@ function SidebarContent({ pathname, onNavigate, isAdmin }: { pathname: string; o
   return (
     <div>
       <div className="sidebar-brand">
-        <img src="/logo.png?v=2" alt="PsychoManager" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }} />
+        <img src="/logo.png?v=3" alt="PsychoManager" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }} />
         <div style={{ display: "flex", flexDirection: "column" }}>
           <span className="sidebar-brand-text">PsychoManager</span>
           <span style={{ fontSize: 11, opacity: 0.7, fontWeight: 400, letterSpacing: "0.5px" }}>Sistema de Psicologia</span>
@@ -141,7 +141,7 @@ export function DashboardShell({ children, userRole, userName }: { children: Rea
             <button type="button" className="header-btn" onClick={() => signOut({ callbackUrl: "/login" })} title="Sair">
               <LogOut className="w-5 h-5" />
             </button>
-            <img src="/logo.png?v=2" alt="PsychoManager" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover" }} />
+            <img src="/logo.png?v=3" alt="PsychoManager" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover" }} />
           </div>
         </header>
 

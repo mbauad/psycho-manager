@@ -24,7 +24,7 @@ export default function RegisterPage() {
     <div className="login-page">
       <section className="login-left">
         <div className="login-left-brand">
-          <div className="login-left-brand-icon">PM</div>
+          <img src="/logo.png?v=3" alt="Logo" style={{ width: 48, height: 48, borderRadius: 10, objectFit: "cover" }} />
           <span className="login-left-brand-text">PsychoManager</span>
         </div>
 
