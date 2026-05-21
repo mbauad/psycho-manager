@@ -9,8 +9,6 @@ services:
     restart: always
     env_file:
       - .env
-    ports:
-      - "3000:3000"
     networks:
       - psycho_supabase_default
       - easypanel
