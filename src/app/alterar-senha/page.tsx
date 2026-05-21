@@ -19,17 +19,17 @@ export default async function AlterarSenhaPage() {
         </div>
 
         <div className="login-left-content">
-          <p className="login-left-tag">Seguranca</p>
+          <p className="login-left-tag">Segurança</p>
           <h1 className="login-left-title">
             Proteja sua conta.
           </h1>
           <p className="login-left-desc">
-            Para continuar utilizando o sistema, voce precisa definir uma nova senha pessoal. Isso garante a seguranca dos seus dados e dos seus pacientes.
+            Para continuar utilizando o sistema, você precisa definir uma nova senha pessoal. Isso garante a segurança dos seus dados e dos seus pacientes.
           </p>
         </div>
 
         <div className="login-left-footer">
-          Sistema de gestao para consultorios de psicologia
+          Sistema de gestão para consultórios de psicologia
         </div>
       </section>
 
@@ -73,7 +73,7 @@ export default async function AlterarSenhaPage() {
           >
             <ShieldAlert className="w-4 h-4" style={{ color: "#f59e0b", marginTop: 2, flexShrink: 0 }} />
             <p style={{ fontSize: 13, color: "#d97706", lineHeight: 1.5, margin: 0 }}>
-              Sua conta foi criada com uma senha temporaria. Por seguranca, voce deve definir uma nova senha antes de acessar o sistema.
+              Sua conta foi criada com uma senha temporária. Por segurança, você deve definir uma nova senha antes de acessar o sistema.
             </p>
           </div>
 

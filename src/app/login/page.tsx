@@ -81,12 +81,12 @@ export default function LoginPage() {
         </div>
 
         <div className="login-left-content">
-          <p className="login-left-tag">Plataforma Clinica</p>
+          <p className="login-left-tag">Plataforma Clínica</p>
           <h1 className="login-left-title">
-            Gestao completa para psicologos.
+            Gestão completa para psicólogos.
           </h1>
           <p className="login-left-desc">
-            Pacientes, sessoes, prontuarios, agenda e financeiro — tudo em um unico lugar, com a seguranca que sua clinica precisa.
+            Pacientes, sessões, prontuários, agenda e financeiro — tudo em um único lugar, com a segurança que sua clínica precisa.
           </p>
         </div>
 

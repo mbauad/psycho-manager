@@ -3,8 +3,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
-  title: "PsychoManager - Gestao de consultorio",
-  description: "Plataforma clinica para gerenciamento de pacientes, sessoes e prontuarios",
+  title: "PsychoManager - Gestão de consultório",
+  description: "Plataforma clínica para gerenciamento de pacientes, sessões e prontuários",
   icons: {
     icon: "/logo.png",
   },

@@ -21,11 +21,11 @@ import { ThemeToggle } from "./theme-toggle";
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
   { href: "/pacientes", label: "Pacientes", icon: Users },
-  { href: "/sessoes", label: "Sessoes", icon: Calendar },
+  { href: "/sessoes", label: "Sessões", icon: Calendar },
   { href: "/agenda", label: "Agenda", icon: Calendar },
   { href: "/financeiro", label: "Financeiro", icon: CreditCard },
-  { href: "/relatorios", label: "Relatorios", icon: FileText },
-  { href: "/configuracoes", label: "Configuracoes", icon: Settings },
+  { href: "/relatorios", label: "Relatórios", icon: FileText },
+  { href: "/configuracoes", label: "Configurações", icon: Settings },
 ];
 
 const adminItem = { href: "/admin", label: "Admin", icon: Shield };

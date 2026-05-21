@@ -29,24 +29,24 @@ export default function RegisterPage() {
         </div>
 
         <div className="login-left-content">
-          <p className="login-left-tag">Plataforma Clinica</p>
+          <p className="login-left-tag">Plataforma Clínica</p>
           <h1 className="login-left-title">
-            Comece a gerenciar sua clinica hoje.
+            Comece a gerenciar sua clínica hoje.
           </h1>
           <p className="login-left-desc">
-            Crie sua conta gratuita e tenha acesso a um sistema completo para gestao de pacientes, sessoes, prontuarios e financeiro.
+            Crie sua conta gratuita e tenha acesso a um sistema completo para gestão de pacientes, sessões, prontuários e financeiro.
           </p>
         </div>
 
         <div className="login-left-footer">
-          Cadastro rapido e gratuito
+          Cadastro rápido e gratuito
         </div>
       </section>
 
       <section className="login-right">
         <div className="login-form-wrapper">
           <h2 className="login-form-title">Criar Conta</h2>
-          <p className="login-form-subtitle">Preencha seus dados para comecar</p>
+          <p className="login-form-subtitle">Preencha seus dados para começar</p>
 
           <form onSubmit={onSubmit}>
             {Object.keys(errors).length > 0 && (
@@ -82,7 +82,7 @@ export default function RegisterPage() {
             </button>
 
             <p className="login-form-link">
-              Ja tem conta? <Link href="/login">Faca login</Link>
+              Já tem conta? <Link href="/login">Faça login</Link>
             </p>
           </form>
         </div>
