@@ -129,7 +129,7 @@ export function ArquivosPaciente({ pacienteId, arquivos, modoEdicao = false }: A
                     loading="lazy"
                   />
                 </a>
-                <div style={{ position: "absolute", insetX: 0, bottom: 0, padding: "16px 6px 4px", background: "linear-gradient(transparent, rgba(0,0,0,0.8))" }}>
+                <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "16px 6px 4px", background: "linear-gradient(transparent, rgba(0,0,0,0.8))" }}>
                   <p style={{ fontSize: 10, color: "#fff", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {arquivo.nomeOriginal}
                   </p>

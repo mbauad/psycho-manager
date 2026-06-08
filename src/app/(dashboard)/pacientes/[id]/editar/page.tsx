@@ -34,7 +34,8 @@ export default async function EditarPacientePage({ params }: PageProps) {
     );
   }
 
-  const arquivos = await listarArquivos(id);
+  const arquivosRaw = await listarArquivos(id);
+  const arquivos = arquivosRaw.map((a) => ({ ...a, createdAt: a.createdAt.toISOString() }));
   const action = updatePaciente.bind(null, id);
 
   return (

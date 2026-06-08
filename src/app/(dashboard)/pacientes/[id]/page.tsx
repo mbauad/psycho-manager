@@ -21,7 +21,8 @@ export default async function PacienteDetalhePage({ params }: PageProps) {
     include: { prontuario: true, sessoes: { orderBy: { dataHoraInicio: "desc" }, take: 5 } },
   });
 
-  const arquivos = await listarArquivos(id);
+  const arquivosRaw = await listarArquivos(id);
+  const arquivos = arquivosRaw.map((a) => ({ ...a, createdAt: a.createdAt.toISOString() }));
 
   if (!paciente) return notFound();
 
