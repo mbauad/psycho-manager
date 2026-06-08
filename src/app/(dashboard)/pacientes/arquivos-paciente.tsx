@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, File, Image, Trash2, X, FileText, Download, Paperclip, CheckCircle } from "lucide-react";
+import { Upload, File, Image, Trash2, X, FileText, Download } from "lucide-react";
 import { uploadArquivo, deleteArquivo } from "./arquivos-actions";
 
 interface Arquivo {
@@ -28,17 +28,6 @@ function formatBytes(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
 }
 
-function getFileIcon(tipo: string) {
-  if (tipo.startsWith("image/")) return <Image className="w-5 h-5 text-blue-400" />;
-  if (tipo === "application/pdf") return <FileText className="w-5 h-5 text-red-400" />;
-  return <File className="w-5 h-5 text-slate-400" />;
-}
-
-function getFileExtension(nome: string): string {
-  const ext = nome.split(".").pop()?.toUpperCase() || "";
-  return ext;
-}
-
 export function ArquivosPaciente({ pacienteId, arquivos, modoEdicao = false }: ArquivosPacienteProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [mensagem, setMensagem] = useState("");
@@ -47,7 +36,6 @@ export function ArquivosPaciente({ pacienteId, arquivos, modoEdicao = false }: A
 
   async function handleFile(file: File) {
     if (!file || file.size === 0) return;
-
     setIsUploading(true);
     setMensagem("");
 
@@ -59,8 +47,7 @@ export function ArquivosPaciente({ pacienteId, arquivos, modoEdicao = false }: A
       if (result.error) {
         setMensagem(result.error);
       } else {
-        setMensagem("Arquivo enviado com sucesso!");
-        setTimeout(() => setMensagem(""), 3000);
+        setMensagem("");
       }
     } catch {
       setMensagem("Erro ao enviar arquivo.");
@@ -82,119 +69,136 @@ export function ArquivosPaciente({ pacienteId, arquivos, modoEdicao = false }: A
     if (file) handleFile(file);
   }
 
-  function handleDragOver(e: React.DragEvent) {
-    e.preventDefault();
-    setDragOver(true);
-  }
-
-  function handleDragLeave(e: React.DragEvent) {
-    e.preventDefault();
-    setDragOver(false);
-  }
-
   async function handleDelete(arquivoId: string) {
-    if (!confirm("Tem certeza que deseja excluir este arquivo?")) return;
-    const result = await deleteArquivo(arquivoId, pacienteId);
-    if (result.error) {
-      setMensagem(result.error);
-    }
+    if (!confirm("Excluir este arquivo?")) return;
+    await deleteArquivo(arquivoId, pacienteId);
   }
 
   const imagens = arquivos.filter((a) => a.tipo.startsWith("image/"));
-  const outrosArquivos = arquivos.filter((a) => !a.tipo.startsWith("image/"));
+  const documentos = arquivos.filter((a) => !a.tipo.startsWith("image/"));
 
   return (
-    <div className="space-y-5">
-      {/* Área de Upload */}
+    <div>
+      {/* Upload */}
       {modoEdicao && (
         <>
           <input
             ref={fileInputRef}
             type="file"
-            id="arquivo-upload"
             onChange={handleFileChange}
-            className="hidden"
+            style={{ display: "none" }}
             accept="image/*,.pdf,.doc,.docx,.txt"
           />
           <div
             onClick={() => fileInputRef.current?.click()}
             onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            className={`relative cursor-pointer rounded-xl border-2 border-dashed transition-all duration-200 p-6 text-center
-              ${dragOver 
-                ? "border-blue-400 bg-blue-500/10" 
-                : "border-slate-600 bg-slate-800/30 hover:border-slate-500 hover:bg-slate-800/50"
-              }
-            `}
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            style={{
+              cursor: "pointer",
+              border: dragOver ? "2px dashed #3b82f6" : "2px dashed #475569",
+              borderRadius: "10px",
+              padding: "20px",
+              textAlign: "center",
+              background: dragOver ? "rgba(59,130,246,0.08)" : "rgba(30,41,59,0.4)",
+              transition: "all 0.2s",
+              marginBottom: "20px",
+            }}
           >
-            <div className="flex flex-col items-center gap-2">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
-                dragOver ? "bg-blue-500/20" : "bg-slate-700/50"
-              }`}>
-                <Upload className={`w-5 h-5 ${dragOver ? "text-blue-400" : "text-slate-400"}`} />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-slate-300">
-                  {isUploading ? "Enviando arquivo..." : "Clique ou arraste o arquivo aqui"}
-                </p>
-                <p className="text-xs text-slate-500 mt-1">
-                  JPG, PNG, GIF, PDF, DOC, TXT — Máximo 10MB
-                </p>
-              </div>
-            </div>
+            <Upload style={{ width: 24, height: 24, color: dragOver ? "#60a5fa" : "#64748b", margin: "0 auto 8px" }} />
+            <p style={{ fontSize: 13, color: "#94a3b8", margin: 0 }}>
+              {isUploading ? "Enviando..." : "Clique ou arraste o arquivo aqui"}
+            </p>
+            <p style={{ fontSize: 11, color: "#475569", margin: "4px 0 0 0" }}>
+              JPG, PNG, PDF, DOC — Máx. 10MB
+            </p>
           </div>
         </>
       )}
 
-      {/* Mensagem de sucesso/erro */}
+      {/* Mensagem */}
       {mensagem && (
-        <div className={`flex items-center gap-2 text-sm px-4 py-2.5 rounded-lg ${
-          mensagem.includes("sucesso") 
-            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
-            : "bg-red-500/10 text-red-400 border border-red-500/20"
-        }`}>
-          {mensagem.includes("sucesso") ? (
-            <CheckCircle className="w-4 h-4 shrink-0" />
-          ) : (
-            <X className="w-4 h-4 shrink-0" />
-          )}
-          <span className="flex-1">{mensagem}</span>
-          <button onClick={() => setMensagem("")} className="hover:opacity-70 shrink-0">
-            <X className="w-3.5 h-3.5" />
+        <div style={{
+          fontSize: 12,
+          padding: "8px 12px",
+          borderRadius: "6px",
+          background: "rgba(239,68,68,0.1)",
+          color: "#f87171",
+          marginBottom: "16px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}>
+          <span>{mensagem}</span>
+          <button onClick={() => setMensagem("")} style={{ background: "none", border: "none", color: "inherit", cursor: "pointer" }}>
+            <X style={{ width: 14, height: 14 }} />
           </button>
         </div>
       )}
 
-      {/* Grid de Imagens */}
+      {/* Imagens com miniatura */}
       {imagens.length > 0 && (
-        <div>
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-            <Image className="w-3.5 h-3.5" />
+        <div style={{ marginBottom: 24 }}>
+          <p style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: "#64748b",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+            marginBottom: 12,
+          }}>
             Imagens ({imagens.length})
-          </h4>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 10 }}>
             {imagens.map((arquivo) => (
-              <div key={arquivo.id} className="group relative rounded-lg overflow-hidden border border-slate-700 bg-slate-800/50">
-                <a href={arquivo.caminho} target="_blank" rel="noopener noreferrer" className="block">
+              <div key={arquivo.id} style={{ position: "relative", borderRadius: 8, overflow: "hidden", border: "1px solid #334155" }}>
+                <a href={arquivo.caminho} target="_blank" rel="noopener noreferrer">
                   <img
                     src={arquivo.caminho}
                     alt={arquivo.nomeOriginal}
-                    className="w-full h-28 object-cover transition-transform group-hover:scale-105"
+                    style={{ width: "100%", height: 100, objectFit: "cover", display: "block" }}
                     loading="lazy"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%231e293b'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='%2364748b' font-size='10'%3EImagem%3C/text%3E%3C/svg%3E";
+                    }}
                   />
                 </a>
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2 pt-6">
-                  <p className="text-[11px] text-white/90 truncate font-medium">{arquivo.nomeOriginal}</p>
-                  <p className="text-[10px] text-white/60">{formatBytes(arquivo.tamanho)}</p>
+                <div style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  padding: "16px 6px 4px",
+                  background: "linear-gradient(transparent, rgba(0,0,0,0.8))",
+                }}>
+                  <p style={{ fontSize: 10, color: "#fff", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {arquivo.nomeOriginal}
+                  </p>
+                  <p style={{ fontSize: 9, color: "rgba(255,255,255,0.6)", margin: 0 }}>
+                    {formatBytes(arquivo.tamanho)}
+                  </p>
                 </div>
                 {modoEdicao && (
                   <button
                     onClick={() => handleDelete(arquivo.id)}
-                    className="absolute top-1.5 right-1.5 w-6 h-6 bg-red-500/90 hover:bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-lg"
-                    title="Excluir"
+                    style={{
+                      position: "absolute",
+                      top: 4,
+                      right: 4,
+                      width: 22,
+                      height: 22,
+                      borderRadius: "50%",
+                      background: "rgba(239,68,68,0.9)",
+                      border: "none",
+                      color: "#fff",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: 0,
+                    }}
                   >
-                    <Trash2 className="w-3 h-3" />
+                    <Trash2 style={{ width: 10, height: 10 }} />
                   </button>
                 )}
               </div>
@@ -203,54 +207,109 @@ export function ArquivosPaciente({ pacienteId, arquivos, modoEdicao = false }: A
         </div>
       )}
 
-      {/* Lista de Documentos */}
-      {outrosArquivos.length > 0 && (
+      {/* Documentos com miniatura de ícone */}
+      {documentos.length > 0 && (
         <div>
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-            <Paperclip className="w-3.5 h-3.5" />
-            Documentos ({outrosArquivos.length})
-          </h4>
-          <div className="space-y-2">
-            {outrosArquivos.map((arquivo) => (
+          <p style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: "#64748b",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+            marginBottom: 12,
+          }}>
+            Documentos ({documentos.length})
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {documentos.map((arquivo) => (
               <div
                 key={arquivo.id}
-                className="group flex items-center gap-3 p-3 rounded-lg bg-slate-800/40 border border-slate-700/50 hover:border-slate-600 hover:bg-slate-800/60 transition-all"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  padding: "10px 12px",
+                  borderRadius: 8,
+                  background: "rgba(30,41,59,0.4)",
+                  border: "1px solid #334155",
+                }}
               >
-                <div className="w-10 h-10 rounded-lg bg-slate-700/60 flex items-center justify-center shrink-0">
-                  {getFileIcon(arquivo.tipo)}
+                {/* Miniatura do arquivo */}
+                <div style={{
+                  width: 40,
+                  height: 48,
+                  borderRadius: 4,
+                  background: arquivo.tipo === "application/pdf" ? "rgba(239,68,68,0.15)" : "rgba(59,130,246,0.15)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                  position: "relative",
+                }}>
+                  {arquivo.tipo === "application/pdf" ? (
+                    <FileText style={{ width: 18, height: 18, color: "#f87171" }} />
+                  ) : (
+                    <File style={{ width: 18, height: 18, color: "#60a5fa" }} />
+                  )}
+                  <span style={{
+                    position: "absolute",
+                    bottom: 2,
+                    right: 2,
+                    fontSize: 7,
+                    fontWeight: 700,
+                    color: arquivo.tipo === "application/pdf" ? "#f87171" : "#60a5fa",
+                    textTransform: "uppercase",
+                  }}>
+                    {arquivo.nomeOriginal.split(".").pop()}
+                  </span>
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-200 truncate">
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 13, color: "#e2e8f0", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {arquivo.nomeOriginal}
                   </p>
-                  <p className="text-[11px] text-slate-500 flex items-center gap-2">
-                    <span className="px-1.5 py-0.5 rounded bg-slate-700/50 text-slate-400 text-[10px] font-medium">
-                      {getFileExtension(arquivo.nomeOriginal)}
-                    </span>
-                    <span>{formatBytes(arquivo.tamanho)}</span>
-                    <span>•</span>
-                    <span>{new Date(arquivo.createdAt).toLocaleDateString("pt-BR")}</span>
+                  <p style={{ fontSize: 11, color: "#475569", margin: "2px 0 0 0" }}>
+                    {formatBytes(arquivo.tamanho)} · {new Date(arquivo.createdAt).toLocaleDateString("pt-BR")}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
                   <a
                     href={arquivo.caminho}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
-                    title="Abrir / Download"
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: 6,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#64748b",
+                      textDecoration: "none",
+                    }}
+                    title="Download"
                   >
-                    <Download className="w-4 h-4" />
+                    <Download style={{ width: 14, height: 14 }} />
                   </a>
                   {modoEdicao && (
                     <button
                       onClick={() => handleDelete(arquivo.id)}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 6,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "none",
+                        border: "none",
+                        color: "#64748b",
+                        cursor: "pointer",
+                      }}
                       title="Excluir"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 style={{ width: 14, height: 14 }} />
                     </button>
                   )}
                 </div>
@@ -260,16 +319,11 @@ export function ArquivosPaciente({ pacienteId, arquivos, modoEdicao = false }: A
         </div>
       )}
 
-      {/* Estado vazio */}
+      {/* Vazio */}
       {arquivos.length === 0 && (
-        <div className="text-center py-10">
-          <div className="w-14 h-14 rounded-full bg-slate-800/50 flex items-center justify-center mx-auto mb-3">
-            <Paperclip className="w-6 h-6 text-slate-600" />
-          </div>
-          <p className="text-sm text-slate-500 font-medium">Nenhum arquivo anexado</p>
-          {modoEdicao && (
-            <p className="text-xs text-slate-600 mt-1">Arraste ou clique acima para enviar</p>
-          )}
+        <div style={{ textAlign: "center", padding: "40px 20px" }}>
+          <Paperclip style={{ width: 32, height: 32, color: "#334155", margin: "0 auto 10px" }} />
+          <p style={{ fontSize: 13, color: "#475569", margin: 0 }}>Nenhum arquivo anexado</p>
         </div>
       )}
     </div>
