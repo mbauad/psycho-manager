@@ -1478,6 +1478,22 @@ textarea.form-input {
   color: #64748b;
 }
 
+.dark .login-right {
+  background: #0f172a;
+}
+
+.dark .login-form-title {
+  color: #f1f5f9;
+}
+
+.dark .login-form-subtitle {
+  color: #94a3b8;
+}
+
+.dark .login-form-link {
+  color: #94a3b8;
+}
+
 .dark .btn-secondary {
   background: #1e293b;
   color: #e2e8f0;
