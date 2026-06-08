@@ -8,7 +8,14 @@ import { writeFile, mkdir, unlink } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
+function getUploadDir(): string {
+  // Em produção com Next.js standalone, os arquivos devem estar em .next/standalone/public/
+  const standaloneDir = path.join(process.cwd(), ".next", "standalone", "public", "uploads");
+  if (existsSync(path.join(process.cwd(), ".next", "standalone"))) {
+    return standaloneDir;
+  }
+  return path.join(process.cwd(), "public", "uploads");
+}
 
 function sanitizeFilename(name: string): string {
   return name
@@ -52,7 +59,8 @@ export async function uploadArquivo(pacienteId: string, formData: FormData) {
   }
 
   // Criar diretório do usuário se não existir
-  const userDir = path.join(UPLOAD_DIR, session.user.id);
+  const uploadDir = getUploadDir();
+  const userDir = path.join(uploadDir, session.user.id);
   if (!existsSync(userDir)) {
     await mkdir(userDir, { recursive: true });
   }
@@ -67,6 +75,15 @@ export async function uploadArquivo(pacienteId: string, formData: FormData) {
   // Salvar arquivo
   const bytes = await file.arrayBuffer();
   await writeFile(filePath, Buffer.from(bytes));
+
+  // Se estiver em standalone, também salvar em public/uploads para persistência
+  const publicDir = path.join(process.cwd(), "public", "uploads", session.user.id);
+  if (uploadDir !== publicDir && !existsSync(publicDir)) {
+    await mkdir(publicDir, { recursive: true });
+  }
+  if (uploadDir !== publicDir) {
+    await writeFile(path.join(publicDir, uniqueName), Buffer.from(bytes));
+  }
 
   // Salvar no banco
   await db.arquivo.create({
@@ -101,11 +118,15 @@ export async function deleteArquivo(arquivoId: string, pacienteId: string) {
     return { error: "Arquivo não encontrado" };
   }
 
-  // Remover arquivo do disco
+  // Remover arquivo do disco (tanto de standalone quanto public)
   try {
-    const fullPath = path.join(process.cwd(), "public", arquivo.caminho);
-    if (existsSync(fullPath)) {
-      await unlink(fullPath);
+    const standalonePath = path.join(process.cwd(), ".next", "standalone", "public", arquivo.caminho);
+    const publicPath = path.join(process.cwd(), "public", arquivo.caminho);
+    if (existsSync(standalonePath)) {
+      await unlink(standalonePath);
+    }
+    if (existsSync(publicPath)) {
+      await unlink(publicPath);
     }
   } catch {
     // Ignora erro se arquivo não existir no disco
