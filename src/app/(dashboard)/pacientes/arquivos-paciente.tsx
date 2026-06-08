@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, File, Image, Trash2, X, FileText, Download } from "lucide-react";
+import { Upload, File, Image, Trash2, X, FileText, Download, Paperclip, CheckCircle } from "lucide-react";
 import { uploadArquivo, deleteArquivo } from "./arquivos-actions";
 
 interface Arquivo {
@@ -23,25 +23,30 @@ interface ArquivosPacienteProps {
 function formatBytes(bytes: number): string {
   if (bytes === 0) return "0 B";
   const k = 1024;
-  const sizes = ["B", "KB", "MB", "GB"];
+  const sizes = ["B", "KB", "MB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
 }
 
 function getFileIcon(tipo: string) {
-  if (tipo.startsWith("image/")) return <Image className="w-5 h-5" />;
-  if (tipo === "application/pdf") return <FileText className="w-5 h-5" />;
-  return <File className="w-5 h-5" />;
+  if (tipo.startsWith("image/")) return <Image className="w-5 h-5 text-blue-400" />;
+  if (tipo === "application/pdf") return <FileText className="w-5 h-5 text-red-400" />;
+  return <File className="w-5 h-5 text-slate-400" />;
+}
+
+function getFileExtension(nome: string): string {
+  const ext = nome.split(".").pop()?.toUpperCase() || "";
+  return ext;
 }
 
 export function ArquivosPaciente({ pacienteId, arquivos, modoEdicao = false }: ArquivosPacienteProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [mensagem, setMensagem] = useState("");
+  const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function handleFile(file: File) {
+    if (!file || file.size === 0) return;
 
     setIsUploading(true);
     setMensagem("");
@@ -55,6 +60,7 @@ export function ArquivosPaciente({ pacienteId, arquivos, modoEdicao = false }: A
         setMensagem(result.error);
       } else {
         setMensagem("Arquivo enviado com sucesso!");
+        setTimeout(() => setMensagem(""), 3000);
       }
     } catch {
       setMensagem("Erro ao enviar arquivo.");
@@ -64,22 +70,44 @@ export function ArquivosPaciente({ pacienteId, arquivos, modoEdicao = false }: A
     }
   }
 
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) handleFile(file);
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFile(file);
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(true);
+  }
+
+  function handleDragLeave(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(false);
+  }
+
   async function handleDelete(arquivoId: string) {
     if (!confirm("Tem certeza que deseja excluir este arquivo?")) return;
-
     const result = await deleteArquivo(arquivoId, pacienteId);
     if (result.error) {
       setMensagem(result.error);
-    } else {
-      setMensagem("Arquivo excluído.");
     }
   }
 
+  const imagens = arquivos.filter((a) => a.tipo.startsWith("image/"));
+  const outrosArquivos = arquivos.filter((a) => !a.tipo.startsWith("image/"));
+
   return (
-    <div className="space-y-4">
-      {/* Upload */}
+    <div className="space-y-5">
+      {/* Área de Upload */}
       {modoEdicao && (
-        <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-slate-400 transition-colors">
+        <>
           <input
             ref={fileInputRef}
             type="file"
@@ -88,109 +116,160 @@ export function ArquivosPaciente({ pacienteId, arquivos, modoEdicao = false }: A
             className="hidden"
             accept="image/*,.pdf,.doc,.docx,.txt"
           />
-          <label
-            htmlFor="arquivo-upload"
-            className="cursor-pointer flex flex-col items-center gap-2"
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            className={`relative cursor-pointer rounded-xl border-2 border-dashed transition-all duration-200 p-6 text-center
+              ${dragOver 
+                ? "border-blue-400 bg-blue-500/10" 
+                : "border-slate-600 bg-slate-800/30 hover:border-slate-500 hover:bg-slate-800/50"
+              }
+            `}
           >
-            <Upload className="w-8 h-8 text-slate-400" />
-            <span className="text-sm text-slate-300">
-              {isUploading ? "Enviando..." : "Clique para enviar imagem ou arquivo de diagnóstico"}
-            </span>
-            <span className="text-xs text-slate-500">
-              JPG, PNG, GIF, PDF, DOC, DOCX, TXT (máx. 10MB)
-            </span>
-          </label>
-        </div>
+            <div className="flex flex-col items-center gap-2">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
+                dragOver ? "bg-blue-500/20" : "bg-slate-700/50"
+              }`}>
+                <Upload className={`w-5 h-5 ${dragOver ? "text-blue-400" : "text-slate-400"}`} />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-300">
+                  {isUploading ? "Enviando arquivo..." : "Clique ou arraste o arquivo aqui"}
+                </p>
+                <p className="text-xs text-slate-500 mt-1">
+                  JPG, PNG, GIF, PDF, DOC, TXT — Máximo 10MB
+                </p>
+              </div>
+            </div>
+          </div>
+        </>
       )}
 
-      {/* Mensagem */}
+      {/* Mensagem de sucesso/erro */}
       {mensagem && (
-        <div className={`text-sm p-3 rounded-lg flex items-center justify-between ${mensagem.includes("sucesso") || mensagem.includes("excluído") ? "bg-green-900/30 text-green-400" : "bg-red-900/30 text-red-400"}`}>
-          <span>{mensagem}</span>
-          <button onClick={() => setMensagem("")} className="hover:opacity-70">
-            <X className="w-4 h-4" />
+        <div className={`flex items-center gap-2 text-sm px-4 py-2.5 rounded-lg ${
+          mensagem.includes("sucesso") 
+            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
+            : "bg-red-500/10 text-red-400 border border-red-500/20"
+        }`}>
+          {mensagem.includes("sucesso") ? (
+            <CheckCircle className="w-4 h-4 shrink-0" />
+          ) : (
+            <X className="w-4 h-4 shrink-0" />
+          )}
+          <span className="flex-1">{mensagem}</span>
+          <button onClick={() => setMensagem("")} className="hover:opacity-70 shrink-0">
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
 
-      {/* Lista de arquivos */}
-      {arquivos.length > 0 ? (
-        <div className="grid gap-3">
-          {arquivos.map((arquivo) => (
-            <div
-              key={arquivo.id}
-              className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700 hover:border-slate-600 transition-colors"
-            >
-              <div className="w-10 h-10 rounded-lg bg-slate-700 flex items-center justify-center text-slate-400 shrink-0">
-                {getFileIcon(arquivo.tipo)}
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-slate-200 truncate">
-                  {arquivo.nomeOriginal}
-                </p>
-                <p className="text-xs text-slate-500">
-                  {formatBytes(arquivo.tamanho)} • {new Date(arquivo.createdAt).toLocaleDateString("pt-BR")}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                <a
-                  href={arquivo.caminho}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-ghost btn-sm"
-                  title="Visualizar / Download"
-                >
-                  <Download className="w-4 h-4" />
+      {/* Grid de Imagens */}
+      {imagens.length > 0 && (
+        <div>
+          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+            <Image className="w-3.5 h-3.5" />
+            Imagens ({imagens.length})
+          </h4>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {imagens.map((arquivo) => (
+              <div key={arquivo.id} className="group relative rounded-lg overflow-hidden border border-slate-700 bg-slate-800/50">
+                <a href={arquivo.caminho} target="_blank" rel="noopener noreferrer" className="block">
+                  <img
+                    src={arquivo.caminho}
+                    alt={arquivo.nomeOriginal}
+                    className="w-full h-28 object-cover transition-transform group-hover:scale-105"
+                    loading="lazy"
+                  />
                 </a>
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2 pt-6">
+                  <p className="text-[11px] text-white/90 truncate font-medium">{arquivo.nomeOriginal}</p>
+                  <p className="text-[10px] text-white/60">{formatBytes(arquivo.tamanho)}</p>
+                </div>
                 {modoEdicao && (
                   <button
                     onClick={() => handleDelete(arquivo.id)}
-                    className="btn btn-ghost btn-sm text-red-400 hover:text-red-300"
+                    className="absolute top-1.5 right-1.5 w-6 h-6 bg-red-500/90 hover:bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-lg"
                     title="Excluir"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3 h-3" />
                   </button>
                 )}
               </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-8 text-slate-500">
-          <File className="w-10 h-10 mx-auto mb-2 opacity-40" />
-          <p className="text-sm">Nenhum arquivo anexado</p>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Preview de imagens */}
-      {arquivos.some((a) => a.tipo.startsWith("image/")) && (
-        <div className="mt-4">
-          <h4 className="text-sm font-medium text-slate-400 mb-3">Imagens</h4>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {arquivos
-              .filter((a) => a.tipo.startsWith("image/"))
-              .map((arquivo) => (
-                <div key={arquivo.id} className="relative group">
-                  <a href={arquivo.caminho} target="_blank" rel="noopener noreferrer">
-                    <img
-                      src={arquivo.caminho}
-                      alt={arquivo.nomeOriginal}
-                      className="w-full h-24 object-cover rounded-lg border border-slate-700 hover:border-slate-500 transition-colors"
-                    />
+      {/* Lista de Documentos */}
+      {outrosArquivos.length > 0 && (
+        <div>
+          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+            <Paperclip className="w-3.5 h-3.5" />
+            Documentos ({outrosArquivos.length})
+          </h4>
+          <div className="space-y-2">
+            {outrosArquivos.map((arquivo) => (
+              <div
+                key={arquivo.id}
+                className="group flex items-center gap-3 p-3 rounded-lg bg-slate-800/40 border border-slate-700/50 hover:border-slate-600 hover:bg-slate-800/60 transition-all"
+              >
+                <div className="w-10 h-10 rounded-lg bg-slate-700/60 flex items-center justify-center shrink-0">
+                  {getFileIcon(arquivo.tipo)}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-slate-200 truncate">
+                    {arquivo.nomeOriginal}
+                  </p>
+                  <p className="text-[11px] text-slate-500 flex items-center gap-2">
+                    <span className="px-1.5 py-0.5 rounded bg-slate-700/50 text-slate-400 text-[10px] font-medium">
+                      {getFileExtension(arquivo.nomeOriginal)}
+                    </span>
+                    <span>{formatBytes(arquivo.tamanho)}</span>
+                    <span>•</span>
+                    <span>{new Date(arquivo.createdAt).toLocaleDateString("pt-BR")}</span>
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <a
+                    href={arquivo.caminho}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
+                    title="Abrir / Download"
+                  >
+                    <Download className="w-4 h-4" />
                   </a>
                   {modoEdicao && (
                     <button
                       onClick={() => handleDelete(arquivo.id)}
-                      className="absolute top-1 right-1 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                      title="Excluir"
                     >
-                      <X className="w-3 h-3" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   )}
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
+        </div>
+      )}
+
+      {/* Estado vazio */}
+      {arquivos.length === 0 && (
+        <div className="text-center py-10">
+          <div className="w-14 h-14 rounded-full bg-slate-800/50 flex items-center justify-center mx-auto mb-3">
+            <Paperclip className="w-6 h-6 text-slate-600" />
+          </div>
+          <p className="text-sm text-slate-500 font-medium">Nenhum arquivo anexado</p>
+          {modoEdicao && (
+            <p className="text-xs text-slate-600 mt-1">Arraste ou clique acima para enviar</p>
+          )}
         </div>
       )}
     </div>
