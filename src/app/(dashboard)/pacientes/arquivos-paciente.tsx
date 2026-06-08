@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, File, Image, Trash2, X, FileText, Download } from "lucide-react";
+import { Upload, File, Image, Trash2, X, FileText, Download, Paperclip } from "lucide-react";
 import { uploadArquivo, deleteArquivo } from "./arquivos-actions";
 
 interface Arquivo {
