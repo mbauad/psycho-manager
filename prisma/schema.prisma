@@ -25,6 +25,7 @@ model User {
   sessoes       Sessao[]
   pagamentos    Pagamento[]
   configuracoes Configuracao?
+  arquivos      Arquivo[]
 }
 
 model Account {
@@ -78,6 +79,7 @@ model Paciente {
   prontuario      Prontuario?
   sessoes         Sessao[]
   pagamentos      Pagamento[]
+  arquivos        Arquivo[]
 }
 
 model Prontuario {
@@ -146,4 +148,20 @@ model Configuracao {
   endereco        String?
   valorSessao     Float?
   tempoSessao     Int      @default(50)
+}
+
+model Arquivo {
+  id          String   @id @default(cuid())
+  nome        String
+  nomeOriginal String
+  tipo        String
+  tamanho     Int
+  caminho     String
+  categoria   String   @default("diagnostico")
+  pacienteId  String
+  paciente    Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

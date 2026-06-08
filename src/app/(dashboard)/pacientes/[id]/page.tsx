@@ -3,7 +3,9 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Phone, FileText, Calendar, User, FileSignature, Clock, Pencil } from "lucide-react";
+import { ArrowLeft, Phone, FileText, Calendar, User, FileSignature, Clock, Pencil, Paperclip } from "lucide-react";
+import { listarArquivos } from "../arquivos-actions";
+import { ArquivosPaciente } from "../arquivos-paciente";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -18,6 +20,8 @@ export default async function PacienteDetalhePage({ params }: PageProps) {
     where: { id, userId: session.user.id },
     include: { prontuario: true, sessoes: { orderBy: { dataHoraInicio: "desc" }, take: 5 } },
   });
+
+  const arquivos = await listarArquivos(id);
 
   if (!paciente) return notFound();
 
@@ -90,6 +94,18 @@ export default async function PacienteDetalhePage({ params }: PageProps) {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          <div className="card">
+            <div className="card-header">
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Paperclip className="w-5 h-5" style={{ color: "#64748b" }} />
+                <h2 className="card-title">Arquivos e Diagnósticos</h2>
+              </div>
+            </div>
+            <div className="card-body">
+              <ArquivosPaciente pacienteId={id} arquivos={arquivos} modoEdicao={false} />
+            </div>
+          </div>
+
           <div className="card">
             <div className="card-header">
               <h2 className="card-title">Resumo Clinico</h2>
