@@ -7,20 +7,34 @@ services:
       dockerfile: Dockerfile
     container_name: psycho-manager
     restart: always
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=${DATABASE_URL}
-      - AUTH_SECRET=${AUTH_SECRET}
-      - NEXTAUTH_URL=${NEXTAUTH_URL}
-      - SETUP_TOKEN=${SETUP_TOKEN}
-      - ADMIN_EMAIL=${ADMIN_EMAIL}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-      - ADMIN_NAME=${ADMIN_NAME}
+    expose:
+      - "3000"
+    env_file:
+      - .env
+    networks:
+      - psycho_supabase_default
+      - easypanel
+    volumes:
+      - uploads-data:/app/.next/standalone/public/uploads
+      - uploads-data:/app/public/uploads
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.psycho-manager.rule=Host(`psycho-manager.site`)
+      - traefik.http.routers.psycho-manager.entrypoints=web,websecure
+      - traefik.http.routers.psycho-manager.tls=true
+      - traefik.http.services.psycho-manager.loadbalancer.server.port=3000
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/login"]
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000/login"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+
+networks:
+  psycho_supabase_default:
+    external: true
+  easypanel:
+    external: true
+
+volumes:
+  uploads-data:
