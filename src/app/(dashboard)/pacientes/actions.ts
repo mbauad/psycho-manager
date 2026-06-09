@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { writeFile, mkdir } from "fs/promises";
+import { writeFile, mkdir, unlink } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
 
@@ -158,7 +158,35 @@ export async function updatePaciente(id: string, formData: FormData) {
 export async function deletePaciente(id: string) {
   const session = await auth();
   if (!session?.user?.id) {
-    return;
+    return { error: "Nao autenticado" };
+  }
+
+  const paciente = await db.paciente.findFirst({
+    where: { id, userId: session.user.id },
+    include: { arquivos: true },
+  });
+
+  if (!paciente) {
+    return { error: "Paciente nao encontrado" };
+  }
+
+  // Remove arquivos do disco
+  for (const arquivo of paciente.arquivos) {
+    try {
+      const diskPath = arquivo.caminho
+        .replace(/^\/api\/uploads\//, "/uploads/")
+        .replace(/^\/uploads\//, "/uploads/");
+      const standalonePath = path.join(process.cwd(), ".next", "standalone", "public", diskPath);
+      const publicPath = path.join(process.cwd(), "public", diskPath);
+      if (existsSync(standalonePath)) {
+        await unlink(standalonePath);
+      }
+      if (existsSync(publicPath)) {
+        await unlink(publicPath);
+      }
+    } catch {
+      // ignora erro se arquivo nao existir no disco
+    }
   }
 
   await db.paciente.delete({
@@ -166,4 +194,5 @@ export async function deletePaciente(id: string) {
   });
 
   revalidatePath("/pacientes");
+  return { success: true };
 }

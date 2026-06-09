@@ -1,8 +1,9 @@
 import { db } from "@/lib/db";
 import { auth } from "@/auth";
+import { DeletePacienteButton } from "./delete-paciente-button";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Search, Plus, Users, Pencil, Trash2 } from "lucide-react";
+import { Search, Plus, Users, Pencil } from "lucide-react";
 
 type PageProps = { searchParams: Promise<{ q?: string }> };
 
@@ -110,6 +111,7 @@ export default async function PacientesPage({ searchParams }: PageProps) {
                             <Pencil className="w-3 h-3" />
                             Editar
                           </Link>
+                          <DeletePacienteButton pacienteId={p.id} nome={p.nomeCompleto} />
                         </div>
                       </td>
                     </tr>
