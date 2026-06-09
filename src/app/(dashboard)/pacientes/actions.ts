@@ -55,7 +55,7 @@ async function saveArquivo(file: File, pacienteId: string, userId: string) {
   const baseName = sanitizeFilename(path.basename(file.name, ext));
   const uniqueName = `${Date.now()}_${baseName}${ext}`;
   const filePath = path.join(userDir, uniqueName);
-  const relativePath = `/uploads/${userId}/${uniqueName}`;
+  const relativePath = `/api/uploads/${userId}/${uniqueName}`;
 
   const bytes = await file.arrayBuffer();
   await writeFile(filePath, Buffer.from(bytes));

@@ -28,6 +28,12 @@ function formatBytes(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
 }
 
+function getArquivoUrl(caminho: string): string {
+  if (caminho.startsWith("/api/uploads/")) return caminho;
+  if (caminho.startsWith("/uploads/")) return caminho.replace(/^\/uploads\//, "/api/uploads/");
+  return caminho;
+}
+
 export function ArquivosPaciente({ pacienteId, arquivos, modoEdicao = false }: ArquivosPacienteProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [mensagem, setMensagem] = useState("");
@@ -121,9 +127,9 @@ export function ArquivosPaciente({ pacienteId, arquivos, modoEdicao = false }: A
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 10 }}>
             {imagens.map((arquivo) => (
               <div key={arquivo.id} style={{ position: "relative", borderRadius: 8, overflow: "hidden", border: "1px solid #334155" }}>
-                <a href={arquivo.caminho} target="_blank" rel="noopener noreferrer">
+                <a href={getArquivoUrl(arquivo.caminho)} target="_blank" rel="noopener noreferrer">
                   <img
-                    src={arquivo.caminho}
+                    src={getArquivoUrl(arquivo.caminho)}
                     alt={arquivo.nomeOriginal}
                     style={{ width: "100%", height: 100, objectFit: "cover", display: "block" }}
                     loading="lazy"
@@ -175,7 +181,7 @@ export function ArquivosPaciente({ pacienteId, arquivos, modoEdicao = false }: A
                   </p>
                 </div>
                 <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
-                  <a href={arquivo.caminho} target="_blank" rel="noopener noreferrer" style={{ width: 28, height: 28, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", textDecoration: "none" }}>
+                  <a href={getArquivoUrl(arquivo.caminho)} target="_blank" rel="noopener noreferrer" style={{ width: 28, height: 28, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", textDecoration: "none" }}>
                     <Download style={{ width: 14, height: 14 }} />
                   </a>
                   {modoEdicao && (

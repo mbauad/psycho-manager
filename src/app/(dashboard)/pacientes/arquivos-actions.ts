@@ -70,7 +70,7 @@ export async function uploadArquivo(pacienteId: string, formData: FormData) {
   const baseName = sanitizeFilename(path.basename(file.name, ext));
   const uniqueName = `${Date.now()}_${baseName}${ext}`;
   const filePath = path.join(userDir, uniqueName);
-  const relativePath = `/uploads/${session.user.id}/${uniqueName}`;
+  const relativePath = `/api/uploads/${session.user.id}/${uniqueName}`;
 
   // Salvar arquivo
   const bytes = await file.arrayBuffer();
@@ -120,8 +120,9 @@ export async function deleteArquivo(arquivoId: string, pacienteId: string) {
 
   // Remover arquivo do disco (tanto de standalone quanto public)
   try {
-    const standalonePath = path.join(process.cwd(), ".next", "standalone", "public", arquivo.caminho);
-    const publicPath = path.join(process.cwd(), "public", arquivo.caminho);
+    const diskPath = arquivo.caminho.replace(/^\/api\/uploads\//, "/uploads/").replace(/^\/uploads\//, "/uploads/");
+    const standalonePath = path.join(process.cwd(), ".next", "standalone", "public", diskPath);
+    const publicPath = path.join(process.cwd(), "public", diskPath);
     if (existsSync(standalonePath)) {
       await unlink(standalonePath);
     }
