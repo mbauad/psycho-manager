@@ -1,19 +1,27 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { createPaciente } from "../actions";
 import Link from "next/link";
 import { UserPlus, ArrowLeft } from "lucide-react";
+import { FileUploadWithPreview, FileWithPreview } from "@/components/file-upload-preview";
 
 export default function NovoPacientePage() {
   const [loading, setLoading] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
+  const [files, setFiles] = useState<FileWithPreview[]>([]);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    
-    const formData = new FormData(e.currentTarget);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    // Anexa os arquivos do estado à FormData
+    files.forEach((f) => {
+      formData.append("arquivos", f.file);
+    });
+
     await createPaciente(formData);
   };
 
@@ -37,7 +45,7 @@ export default function NovoPacientePage() {
           </div>
         </div>
         <div className="card-body">
-          <form ref={formRef} onSubmit={onSubmit}>
+          <form onSubmit={onSubmit}>
             <div className="form-group">
               <label className="form-label">Nome completo *</label>
               <input name="nomeCompleto" required className="form-input" />
@@ -74,6 +82,14 @@ export default function NovoPacientePage() {
               <label className="form-label">Observacoes</label>
               <textarea name="observacoes" rows={3} className="form-input" />
             </div>
+
+            {/* Upload de documentos / fotos */}
+            <FileUploadWithPreview
+              files={files}
+              onChange={setFiles}
+              maxFiles={5}
+              maxSizeMB={10}
+            />
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 24 }}>
               <Link href="/pacientes" className="btn btn-secondary">Cancelar</Link>
